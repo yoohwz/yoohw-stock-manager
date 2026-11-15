@@ -107,6 +107,11 @@ class YSM_Store {
 			if ( null === $after || abs( (float) $after - $expected ) > 0.0000005 ) {
 				throw new RuntimeException( 'stock_write_failed' );
 			}
+			$lookup = $wpdb->get_row( $wpdb->prepare( "SELECT stock_quantity, stock_status FROM {$wpdb->prefix}wc_product_meta_lookup WHERE product_id=%d", $id ) );
+			$status = $wpdb->get_var( $wpdb->prepare( "SELECT meta_value FROM {$wpdb->postmeta} WHERE post_id=%d AND meta_key='_stock_status'", $id ) );
+			if ( ! $lookup || null === $lookup->stock_quantity || abs( (float) $lookup->stock_quantity - $expected ) > 0.0000005 || $lookup->stock_status !== $product->get_stock_status() || $status !== $product->get_stock_status() ) {
+				throw new RuntimeException( 'stock_lookup_write_failed' );
+			}
 			if ( ! self::record( $product, $before, (float) $after, [ 'operation_key' => $key, 'payload_hash' => $hash, 'source' => 'free', 'reason' => $reason, 'note' => $note ] ) ) {
 				throw new RuntimeException( 'history_write_failed' );
 			}

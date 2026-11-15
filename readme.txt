@@ -2,7 +2,7 @@
 Contributors: yoohwz
 Tags: woocommerce, inventory, stock, stock manager
 Requires at least: 6.3
-Tested up to: 7.0
+Tested up to: 7.1
 Requires PHP: 7.4
 Requires Plugins: woocommerce
 Stable tag: 0.1.0

@@ -25,7 +25,7 @@ class YSM_List_Table extends WP_List_Table {
 		];
 	}
 	protected function get_table_classes() {
-		return array_merge( parent::get_table_classes(), [ 'ysm-stock-manager-table' ] );
+		return array_merge( parent::get_table_classes(), [ 'ysm-stock-manager-table', $this->history ? 'ysm-history-table' : 'ysm-inventory-table' ] );
 	}
 	public function no_items() {
 		echo '<div class="ysm-empty-state"><strong>' . esc_html__( 'No items match this view.', 'yoohw-stock-manager' ) . '</strong><p>' . esc_html__( 'Reset the filters or enable stock management on your WooCommerce products. History starts when tracking is enabled.', 'yoohw-stock-manager' ) . '</p></div>';

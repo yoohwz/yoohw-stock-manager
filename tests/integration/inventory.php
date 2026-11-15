@@ -53,6 +53,31 @@ try {
 	ysm_assert( is_wp_error( $result ), 'Failure injection not rejected' );
 	ysm_assert( 0.0 === (float) wc_get_product( $id )->get_stock_quantity(), 'Stock not rolled back' );
 	ysm_assert( $before_count === YSM_Store::history( [ 'product_id' => $id ], 25, 0, 0, true ), 'Rollback observer leaked' );
+	// Woo API also ignores lookup write failures; verify and roll back the whole change.
+	$fail_lookup = static function ( $query ) use ( $wpdb ) {
+		return preg_match( '/^(?:INSERT|REPLACE|UPDATE).*' . preg_quote( $wpdb->prefix . 'wc_product_meta_lookup', '/' ) . '/i', $query ) ? 'INVALID YSM LOOKUP TEST SQL' : $query;
+	};
+	$old = $wpdb->suppress_errors( true );
+	add_filter( 'query', $fail_lookup );
+	$result = $adjust( 'increase', '6' );
+	remove_filter( 'query', $fail_lookup );
+	$wpdb->suppress_errors( $old );
+	ysm_assert( is_wp_error( $result ), 'Lookup failure committed' );
+	ysm_assert( 0.0 === (float) wc_get_product( $id )->get_stock_quantity(), 'Lookup failure stock not rolled back' );
+	$fail_status = static function ( $query ) use ( $wpdb ) {
+		return preg_match( '/^UPDATE.*' . preg_quote( $wpdb->postmeta, '/' ) . '.*meta_value.*instock/i', $query ) ? 'INVALID YSM STATUS TEST SQL' : $query;
+	};
+	$old = $wpdb->suppress_errors( true );
+	add_filter( 'query', $fail_status );
+	$result = $adjust( 'increase', '7' );
+	remove_filter( 'query', $fail_status );
+	$wpdb->suppress_errors( $old );
+	ysm_assert( is_wp_error( $result ), 'Status failure committed' );
+	ysm_assert( 0.0 === (float) wc_get_product( $id )->get_stock_quantity(), 'Status failure stock not rolled back' );
+	// Existing caller transactions must survive refused adjustments.
+	$wpdb->query( 'START TRANSACTION' );
+	ysm_assert( is_wp_error( $adjust( 'increase', '4' ) ), 'Nested transaction accepted' );
+	$wpdb->query( 'ROLLBACK' );
 	// A standard product save is observed once.
 	$p = wc_get_product( $id );
 	$p->set_stock_quantity( 20 );

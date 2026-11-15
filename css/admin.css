@@ -180,3 +180,11 @@
  .ysm-stock-filters { align-items: stretch; flex-direction: column; }
  .ysm-stock-filters input,.ysm-stock-filters select,.ysm-stock-bulk input,.ysm-stock-bulk select { width: 100%; min-width: 0; }
 }
+
+/* Keep the reduced tables legible in a keyboard-scrollable viewport. */
+.ysm-history-table { min-width: 940px; }
+@media (max-width: 782px) {
+ .ysm-stock-manager-table thead th, .ysm-stock-manager-table tfoot th, .ysm-stock-manager-table tbody td { display: table-cell !important; padding: 8px 10px !important; }
+ .ysm-stock-manager-table tbody td::before, .ysm-stock-manager-table .toggle-row { display: none !important; }
+ .ysm-stock-manager-table tr { display: table-row !important; }
+}

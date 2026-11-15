@@ -47,7 +47,7 @@ class YSM_Admin {
 	}
 	public function adjust() {
 		$this->permission();
-		check_admin_referer( 'ysm_adjust' );
+		check_admin_referer( 'ysm_adjust', 'ysm_nonce' );
 		$ids = isset( $_POST['product_ids'] ) && is_array( $_POST['product_ids'] ) ? array_values( array_unique( array_map( 'absint', $_POST['product_ids'] ) ) ) : []; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput -- Integer IDs only.
 		if ( ! $ids || count( $ids ) > 25 ) {
 			wp_die( esc_html__( 'Select between 1 and 25 products on this page.', 'yoohw-stock-manager' ) );
@@ -127,7 +127,7 @@ class YSM_Admin {
 		echo '</select>';
 	}
 	private function adjustment_fields() {
-		wp_nonce_field( 'ysm_adjust' );
+		wp_nonce_field( 'ysm_adjust', 'ysm_nonce' );
 		echo '<input type="hidden" name="action" value="ysm_adjust"><input type="hidden" name="operation_uuid" value="' . esc_attr( wp_generate_uuid4() ) . '">';
 		$this->select( 'operation', __( 'Operation', 'yoohw-stock-manager' ), [ 'increase' => __( 'Increase', 'yoohw-stock-manager' ), 'decrease' => __( 'Decrease', 'yoohw-stock-manager' ), 'set' => __( 'Set quantity', 'yoohw-stock-manager' ) ], 'increase', true );
 		echo '<label class="screen-reader-text" for="ysm-quantity">' . esc_html__( 'Quantity', 'yoohw-stock-manager' ) . '</label><input id="ysm-quantity" name="quantity" type="number" step="any" required placeholder="' . esc_attr__( 'Quantity', 'yoohw-stock-manager' ) . '">';
@@ -206,7 +206,7 @@ class YSM_Admin {
 			$this->adjustment_fields();
 			echo '</div>';
 		}
-		echo '<div class="ysm-stock-table-wrap">';
+		echo '<div class="ysm-stock-table-wrap" tabindex="0" role="region" aria-label="' . esc_attr( $history ? __( 'Stock history table', 'yoohw-stock-manager' ) : __( 'Inventory table', 'yoohw-stock-manager' ) ) . '">';
 		$table = new YSM_List_Table( $history, $rows, $total );
 		$table->display();
 		echo '</div></form></div>';

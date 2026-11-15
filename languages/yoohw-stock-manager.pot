@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-11-15T07:07:07+00:00\n"
+"POT-Creation-Date: 2026-11-15T07:15:22+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.9.0\n"
 "X-Domain: yoohw-stock-manager\n"
@@ -259,6 +259,14 @@ msgstr ""
 msgid "Select products below. Apply one operation to up to 25 products per page; repeat on other pages as needed. There is no usage limit."
 msgstr ""
 
+#: inc/class-ysm-admin.php:209
+msgid "Stock history table"
+msgstr ""
+
+#: inc/class-ysm-admin.php:209
+msgid "Inventory table"
+msgstr ""
+
 #: inc/class-ysm-list-table.php:18
 msgid "Date"
 msgstr ""
@@ -332,7 +340,7 @@ msgstr ""
 msgid "The stock transaction could not start."
 msgstr ""
 
-#: inc/class-ysm-store.php:119
+#: inc/class-ysm-store.php:124
 msgid "The stock adjustment could not be completed. Refresh stock and retry."
 msgstr ""
 

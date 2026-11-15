@@ -10,3 +10,4 @@ for test in inventory.php; do
   "$WP_CLI" --path="$WP_PATH" eval-file "$PLUGIN_DIR/tests/integration/$test"
 done
 python3 "$PLUGIN_DIR/tests/concurrency.py"
+python3 "$PLUGIN_DIR/tests/http-boundaries.py"

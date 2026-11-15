@@ -189,6 +189,16 @@ jobs:
       - name: Run smoke checks
         run: wp --path="${{ runner.temp }}/wordpress" eval-file "$GITHUB_WORKSPACE/tests/smoke/ysm-smoke.php"
 
+      - name: Check WordPress.org review package
+        if: ${{ matrix.php == '8.2' }}
+        run: |
+          python3 bin/build-package.py "$RUNNER_TEMP/ysm-review.zip"
+          mkdir -p "$RUNNER_TEMP/ysm-dist"
+          unzip -q "$RUNNER_TEMP/ysm-review.zip" -d "$RUNNER_TEMP/ysm-dist"
+          wp plugin install plugin-check --version=2.2.0 --activate --path="${{ runner.temp }}/wordpress"
+          wp plugin check "$RUNNER_TEMP/ysm-dist/yoohw-stock-manager" --path="${{ runner.temp }}/wordpress" --format=json > "$RUNNER_TEMP/plugin-check.txt"
+          python3 bin/check-plugin-check.py "$RUNNER_TEMP/plugin-check.txt"
+
   ci-gate:
     name: ${{ needs.classify.outputs.full == 'true' && 'CI Gate' || 'Iteration Gate' }}
     if: ${{ always() }}
