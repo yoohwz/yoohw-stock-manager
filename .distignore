@@ -1,0 +1,13 @@
+.git
+.github
+.gitignore
+.DS_Store
+.distignore
+tests
+node_modules
+*.zip
+AGENTS.md
+docs
+bin
+README.md
+artifacts
