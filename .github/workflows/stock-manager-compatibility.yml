@@ -159,6 +159,7 @@ jobs:
           wp plugin install woocommerce --path="$WP_PATH" --version="$WC_VERSION" --activate
           ln -s "$GITHUB_WORKSPACE" "$WP_PATH/wp-content/plugins/yoohw-stock-manager"
           wp plugin activate yoohw-stock-manager --path="$WP_PATH"
+          wp option update ysm_disposable_tests 1 --path="$WP_PATH"
           if [ "$ORDER_STORAGE" = "hpos" ]; then
             wp option update woocommerce_custom_orders_table_enabled yes --path="$WP_PATH"
             wp option update woocommerce_custom_orders_table_data_sync_enabled yes --path="$WP_PATH"

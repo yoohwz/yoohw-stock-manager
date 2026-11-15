@@ -1,0 +1,357 @@
+# Copyright (C) 2026 Yo Ohw Studio
+# This file is distributed under the GPL-2.0-or-later.
+msgid ""
+msgstr ""
+"Project-Id-Version: YoOhw Stock Manager for WooCommerce 0.1.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/yoohw-stock-manager\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-11-15T07:07:07+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.9.0\n"
+"X-Domain: yoohw-stock-manager\n"
+
+#. Plugin Name of the plugin
+msgid "YoOhw Stock Manager for WooCommerce"
+msgstr ""
+
+#. Description of the plugin
+msgid "Manage WooCommerce stock, adjustments, movement history and basic CSV exports."
+msgstr ""
+
+#. Author of the plugin
+msgid "Yo Ohw Studio"
+msgstr ""
+
+#. Author URI of the plugin
+msgid "https://yoohw.com"
+msgstr ""
+
+#: inc/class-ysm-admin.php:13
+#: inc/class-ysm-admin.php:19
+#: inc/class-ysm-admin.php:144
+msgid "Stock Manager"
+msgstr ""
+
+#: inc/class-ysm-admin.php:13
+msgid "WooCommerce"
+msgstr ""
+
+#: inc/class-ysm-admin.php:13
+msgid "Order"
+msgstr ""
+
+#: inc/class-ysm-admin.php:13
+msgid "Refund restock (order)"
+msgstr ""
+
+#: inc/class-ysm-admin.php:16
+msgid "WooCommerce adjustment"
+msgstr ""
+
+#: inc/class-ysm-admin.php:16
+msgid "Order sale"
+msgstr ""
+
+#: inc/class-ysm-admin.php:16
+msgid "Order restore"
+msgstr ""
+
+#: inc/class-ysm-admin.php:16
+msgid "Refund return"
+msgstr ""
+
+#: inc/class-ysm-admin.php:20
+#: inc/class-ysm-admin.php:145
+msgid "Inventory"
+msgstr ""
+
+#: inc/class-ysm-admin.php:20
+#: inc/class-ysm-admin.php:145
+#: inc/class-ysm-list-table.php:65
+msgid "History"
+msgstr ""
+
+#: inc/class-ysm-admin.php:20
+#: inc/class-ysm-admin.php:145
+msgid "Settings & help"
+msgstr ""
+
+#: inc/class-ysm-admin.php:32
+msgid "You do not have permission to manage stock."
+msgstr ""
+
+#: inc/class-ysm-admin.php:53
+msgid "Select between 1 and 25 products on this page."
+msgstr ""
+
+#: inc/class-ysm-admin.php:132
+msgid "Operation"
+msgstr ""
+
+#: inc/class-ysm-admin.php:132
+msgid "Increase"
+msgstr ""
+
+#: inc/class-ysm-admin.php:132
+msgid "Decrease"
+msgstr ""
+
+#: inc/class-ysm-admin.php:132
+msgid "Set quantity"
+msgstr ""
+
+#: inc/class-ysm-admin.php:133
+msgid "Quantity"
+msgstr ""
+
+#: inc/class-ysm-admin.php:134
+#: inc/class-ysm-admin.php:181
+#: inc/class-ysm-list-table.php:20
+msgid "Reason"
+msgstr ""
+
+#: inc/class-ysm-admin.php:135
+msgid "Note"
+msgstr ""
+
+#: inc/class-ysm-admin.php:135
+msgid "Note (optional)"
+msgstr ""
+
+#: inc/class-ysm-admin.php:136
+msgid "Apply adjustment"
+msgstr ""
+
+#: inc/class-ysm-admin.php:144
+msgid "Stock Manager navigation"
+msgstr ""
+
+#: inc/class-ysm-admin.php:150
+msgid "Premium is active. Use Premium to adjust stock. Free tracking is paused; existing Free history remains available to read and export."
+msgstr ""
+
+#: inc/class-ysm-admin.php:153
+msgid "A WooCommerce stock change could not be recorded. History may be incomplete. Check database health before relying on exports."
+msgstr ""
+
+#. translators: 1: successful count, 2: failed count, 3: skipped count.
+#: inc/class-ysm-admin.php:160
+msgid "%1$d successful, %2$d failed, %3$d skipped (unchanged or already applied)."
+msgstr ""
+
+#: inc/class-ysm-admin.php:167
+msgid "Stock settings"
+msgstr ""
+
+#: inc/class-ysm-admin.php:167
+msgid "WooCommerce controls stock quantities, backorders, low stock thresholds and inventory emails. Stock Manager does not send duplicate alerts."
+msgstr ""
+
+#: inc/class-ysm-admin.php:167
+msgid "Open WooCommerce inventory settings"
+msgstr ""
+
+#: inc/class-ysm-admin.php:167
+msgid "Quick start"
+msgstr ""
+
+#: inc/class-ysm-admin.php:167
+msgid "Enable stock management on products. Use Inventory to search and select products, adjust received goods or counts, then check History and export CSV. Shared parent stock is shown once on the parent; search a variation SKU or ID to find its owner."
+msgstr ""
+
+#: inc/class-ysm-admin.php:167
+msgid "Tracking starts when this plugin is active. Standard WooCommerce stock updates, order reductions/restores and restocked refunds are observed. Direct database writes and historical changes are not reconstructed. Concurrent external writers can limit observed before/after accuracy. Deactivation or uninstall keeps Free history; Premium activation pauses Free tracking and adjustments."
+msgstr ""
+
+#: inc/class-ysm-admin.php:172
+msgid "Stock-managed products"
+msgstr ""
+
+#: inc/class-ysm-admin.php:172
+#: inc/class-ysm-admin.php:187
+#: inc/class-ysm-list-table.php:69
+msgid "Low stock"
+msgstr ""
+
+#: inc/class-ysm-admin.php:172
+msgid "Out of stock"
+msgstr ""
+
+#: inc/class-ysm-admin.php:175
+msgid "WooCommerce stock is the current tracked quantity. Shared stock is counted once. Increase stock only for goods already received."
+msgstr ""
+
+#: inc/class-ysm-admin.php:179
+msgid "Product ID"
+msgstr ""
+
+#: inc/class-ysm-admin.php:180
+#: inc/class-ysm-list-table.php:20
+msgid "Source"
+msgstr ""
+
+#: inc/class-ysm-admin.php:180
+msgid "All sources"
+msgstr ""
+
+#: inc/class-ysm-admin.php:181
+msgid "All reasons"
+msgstr ""
+
+#: inc/class-ysm-admin.php:182
+msgid "From date"
+msgstr ""
+
+#: inc/class-ysm-admin.php:182
+msgid "To date"
+msgstr ""
+
+#: inc/class-ysm-admin.php:186
+msgid "Product, SKU, or ID"
+msgstr ""
+
+#: inc/class-ysm-admin.php:186
+msgid "Product, SKU, or ID…"
+msgstr ""
+
+#: inc/class-ysm-admin.php:187
+msgid "Stock status"
+msgstr ""
+
+#: inc/class-ysm-admin.php:187
+msgid "All stock statuses"
+msgstr ""
+
+#: inc/class-ysm-admin.php:188
+msgid "Category"
+msgstr ""
+
+#: inc/class-ysm-admin.php:188
+msgid "All categories"
+msgstr ""
+
+#: inc/class-ysm-admin.php:190
+msgid "Filter"
+msgstr ""
+
+#: inc/class-ysm-admin.php:190
+msgid "Reset"
+msgstr ""
+
+#: inc/class-ysm-admin.php:192
+msgid "Export CSV"
+msgstr ""
+
+#: inc/class-ysm-admin.php:199
+#: inc/class-ysm-list-table.php:73
+msgid "Adjust stock"
+msgstr ""
+
+#: inc/class-ysm-admin.php:205
+msgid "Bulk adjustment"
+msgstr ""
+
+#: inc/class-ysm-admin.php:205
+msgid "Select products below. Apply one operation to up to 25 products per page; repeat on other pages as needed. There is no usage limit."
+msgstr ""
+
+#: inc/class-ysm-list-table.php:18
+msgid "Date"
+msgstr ""
+
+#: inc/class-ysm-list-table.php:18
+#: inc/class-ysm-list-table.php:22
+msgid "Product"
+msgstr ""
+
+#: inc/class-ysm-list-table.php:19
+msgid "Change"
+msgstr ""
+
+#: inc/class-ysm-list-table.php:19
+msgid "Before → after"
+msgstr ""
+
+#: inc/class-ysm-list-table.php:20
+msgid "User / note"
+msgstr ""
+
+#: inc/class-ysm-list-table.php:23
+msgid "Status"
+msgstr ""
+
+#: inc/class-ysm-list-table.php:23
+msgid "WooCommerce stock"
+msgstr ""
+
+#: inc/class-ysm-list-table.php:24
+msgid "Low stock threshold"
+msgstr ""
+
+#: inc/class-ysm-list-table.php:24
+msgid "Actions"
+msgstr ""
+
+#: inc/class-ysm-list-table.php:31
+msgid "No items match this view."
+msgstr ""
+
+#: inc/class-ysm-list-table.php:31
+msgid "Reset the filters or enable stock management on your WooCommerce products. History starts when tracking is enabled."
+msgstr ""
+
+#: inc/class-ysm-list-table.php:49
+msgid "System"
+msgstr ""
+
+#: inc/class-ysm-store.php:39
+msgid "Stock adjustment is unavailable for this product."
+msgstr ""
+
+#: inc/class-ysm-store.php:43
+msgid "Check the operation, quantity and reason."
+msgstr ""
+
+#: inc/class-ysm-store.php:51
+msgid "Stock adjustment requires a supported database connection."
+msgstr ""
+
+#: inc/class-ysm-store.php:66
+msgid "Stock adjustment requires an independent transaction."
+msgstr ""
+
+#: inc/class-ysm-store.php:71
+msgid "Stock adjustment requires InnoDB storage."
+msgstr ""
+
+#: inc/class-ysm-store.php:75
+msgid "The stock transaction could not start."
+msgstr ""
+
+#: inc/class-ysm-store.php:119
+msgid "The stock adjustment could not be completed. Refresh stock and retry."
+msgstr ""
+
+#: inc/functions.php:50
+msgid "Manual adjustment"
+msgstr ""
+
+#: inc/functions.php:51
+msgid "Inventory count"
+msgstr ""
+
+#: inc/functions.php:52
+msgid "Correction"
+msgstr ""
+
+#: inc/functions.php:53
+msgid "Goods received"
+msgstr ""
+
+#: yoohw-stock-manager.php:34
+msgid "YoOhw Stock Manager requires WooCommerce to be active."
+msgstr ""
