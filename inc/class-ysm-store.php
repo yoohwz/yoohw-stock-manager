@@ -171,7 +171,7 @@ class YSM_Store {
 			$where[] = 'EXISTS (SELECT 1 FROM ' . $wpdb->term_relationships . ' tr JOIN ' . $wpdb->term_taxonomy . " tt ON tt.term_taxonomy_id=tr.term_taxonomy_id WHERE tr.object_id=IF(p.post_parent>0,p.post_parent,p.ID) AND tt.taxonomy='product_cat' AND tt.term_id IN (" . implode( ',', array_map( 'absint', $terms ) ) . '))';
 		}
 		$status = $filters['status'] ?? '';
-		if ( in_array( $status, [ 'instock', 'outofstock', 'onbackorder' ], true ) ) {
+		if ( '' !== $status && isset( wc_get_product_stock_status_options()[ $status ] ) ) {
 			$where[] = $wpdb->prepare( 'l.stock_status = %s', $status );
 		} elseif ( 'low' === $status ) {
 			$where[] = $wpdb->prepare( "l.stock_quantity <= COALESCE(NULLIF(low.meta_value,''),NULLIF(plow.meta_value,''),%f) AND l.stock_status <> 'outofstock'", (float) get_option( 'woocommerce_notify_low_stock_amount', 2 ) );

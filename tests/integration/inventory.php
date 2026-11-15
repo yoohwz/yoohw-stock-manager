@@ -22,6 +22,13 @@ try {
 	$p->save();
 	$test_ids[] = $p->get_id();
 	$id = $p->get_id();
+	// Read-only filtering must honor statuses supplied by existing Woo extensions.
+	$custom_status = static function ( $options ) { return $options + [ 'custom_stock' => 'Custom stock' ]; };
+	add_filter( 'woocommerce_product_stock_status_options', $custom_status );
+	$wpdb->update( $wpdb->prefix . 'wc_product_meta_lookup', [ 'stock_status' => 'custom_stock' ], [ 'product_id' => $id ] );
+	ysm_assert( [ $id ] === array_map( 'intval', YSM_Store::inventory( [ 'status' => 'custom_stock' ] ) ), 'Woo custom stock status filter ignored' );
+	$wpdb->update( $wpdb->prefix . 'wc_product_meta_lookup', [ 'stock_status' => 'instock' ], [ 'product_id' => $id ] );
+	remove_filter( 'woocommerce_product_stock_status_options', $custom_status );
 	$key = wp_generate_uuid4();
 	$adjust = static function ( $op, $qty, $uuid = null, $pid = null ) use ( $id ) {
 		return YSM_Store::adjust( $pid ?: $id, $op, $qty, 'inventory_count', 'Fixture note', $uuid ?: wp_generate_uuid4() );
