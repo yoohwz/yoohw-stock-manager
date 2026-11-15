@@ -71,6 +71,11 @@ try {
 	$wpdb->suppress_errors( $old );
 	ysm_assert( is_wp_error( $result ), 'Lookup failure committed' );
 	ysm_assert( 0.0 === (float) wc_get_product( $id )->get_stock_quantity(), 'Lookup failure stock not rolled back' );
+	// Retry the same balance without flushing the process cache: Woo caches lookup
+	// data even when its SQL write fails, and must not skip the retry's SQL write.
+	ysm_assert( 'success' === $adjust( 'increase', '6' ), 'Lookup rollback cache prevented retry' );
+	ysm_assert( 'success' === $adjust( 'decrease', '6' ), 'Lookup retry cleanup' );
+	$before_count += 2;
 	$fail_status = static function ( $query ) use ( $wpdb ) {
 		return preg_match( '/^UPDATE.*' . preg_quote( $wpdb->postmeta, '/' ) . '.*meta_value.*instock/i', $query ) ? 'INVALID YSM STATUS TEST SQL' : $query;
 	};

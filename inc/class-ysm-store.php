@@ -12,10 +12,12 @@ class YSM_Store {
 
 	public static function forget( $id ) {
 		clean_post_cache( $id );
+		wp_cache_delete( 'lookup_table', 'object_' . $id );
 		wc_delete_product_transients( $id );
 		$product = wc_get_product( $id );
 		if ( $product && $product->get_parent_id() ) {
 			clean_post_cache( $product->get_parent_id() );
+			wp_cache_delete( 'lookup_table', 'object_' . $product->get_parent_id() );
 			wc_delete_product_transients( $product->get_parent_id() );
 		}
 	}
