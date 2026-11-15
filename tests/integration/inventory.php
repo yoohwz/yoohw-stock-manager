@@ -60,6 +60,10 @@ try {
 	ysm_assert( is_wp_error( $result ), 'Failure injection not rejected' );
 	ysm_assert( 0.0 === (float) wc_get_product( $id )->get_stock_quantity(), 'Stock not rolled back' );
 	ysm_assert( $before_count === YSM_Store::history( [ 'product_id' => $id ], 25, 0, 0, true ), 'Rollback observer leaked' );
+	// Keep status unchanged across the failed write so stale lookup cache cannot
+	// be accidentally refreshed by an out-of-stock -> in-stock transition.
+	ysm_assert( 'success' === $adjust( 'set', '10' ), 'Lookup failure setup' );
+	++$before_count;
 	// Woo API also ignores lookup write failures; verify and roll back the whole change.
 	$fail_lookup = static function ( $query ) use ( $wpdb ) {
 		return preg_match( '/^(?:INSERT|REPLACE|UPDATE).*' . preg_quote( $wpdb->prefix . 'wc_product_meta_lookup', '/' ) . '/i', $query ) ? 'INVALID YSM LOOKUP TEST SQL' : $query;
@@ -70,11 +74,11 @@ try {
 	remove_filter( 'query', $fail_lookup );
 	$wpdb->suppress_errors( $old );
 	ysm_assert( is_wp_error( $result ), 'Lookup failure committed' );
-	ysm_assert( 0.0 === (float) wc_get_product( $id )->get_stock_quantity(), 'Lookup failure stock not rolled back' );
+	ysm_assert( 10.0 === (float) wc_get_product( $id )->get_stock_quantity(), 'Lookup failure stock not rolled back' );
 	// Retry the same balance without flushing the process cache: Woo caches lookup
 	// data even when its SQL write fails, and must not skip the retry's SQL write.
 	ysm_assert( 'success' === $adjust( 'increase', '6' ), 'Lookup rollback cache prevented retry' );
-	ysm_assert( 'success' === $adjust( 'decrease', '6' ), 'Lookup retry cleanup' );
+	ysm_assert( 'success' === $adjust( 'decrease', '16' ), 'Lookup retry cleanup' );
 	$before_count += 2;
 	$fail_status = static function ( $query ) use ( $wpdb ) {
 		return preg_match( '/^UPDATE.*' . preg_quote( $wpdb->postmeta, '/' ) . '.*meta_value.*instock/i', $query ) ? 'INVALID YSM STATUS TEST SQL' : $query;
