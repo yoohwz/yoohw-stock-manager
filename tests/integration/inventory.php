@@ -130,6 +130,18 @@ try {
 	remove_filter( 'woocommerce_stock_amount', 'floatval' );
 	add_filter( 'woocommerce_stock_amount', 'intval' );
 	require_once dirname( __DIR__, 2 ) . '/inc/class-ysm-admin.php';
+	for ( $index = 0; $index < 260; ++$index ) {
+		YSM_Store::record( wc_get_product( $id ), 1, 2, [ 'source' => 'chunk_fixture', 'reason' => 'correction' ] );
+	}
+	$chunk_stream = fopen( 'php://temp', 'w+' );
+	YSM_Admin::write_csv( $chunk_stream, true, [ 'product_id' => $id, 'source' => 'chunk_fixture' ] );
+	rewind( $chunk_stream );
+	$chunk_rows = 0;
+	while ( false !== fgetcsv( $chunk_stream, 0, ',', '"', '' ) ) {
+		++$chunk_rows;
+	}
+	fclose( $chunk_stream );
+	ysm_assert( 261 === $chunk_rows, 'CSV cursor skipped or duplicated rows across chunks' );
 	$stream = fopen( 'php://temp', 'w+' );
 	YSM_Admin::write_csv( $stream, true, [ 'product_id' => $id, 'source' => 'refund' ] );
 	rewind( $stream );

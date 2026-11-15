@@ -117,6 +117,10 @@ class YSM_Admin {
 				}
 				fputcsv( $stream, ysm_csv_row( $values ), ',', '"', '' );
 			}
+			// Bound request-local object cache growth while streaming large exports.
+			if ( wp_cache_supports( 'flush_runtime' ) ) {
+				wp_cache_flush_runtime();
+			}
 		} while ( count( $rows ) === 250 );
 	}
 	private function select( $name, $label, array $options, $value, $required = false ) {
