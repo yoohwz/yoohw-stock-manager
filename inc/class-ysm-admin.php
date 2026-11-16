@@ -5,7 +5,9 @@ defined( 'ABSPATH' ) || exit;
 class YSM_Admin {
 	public function __construct() {
 		add_action( 'admin_menu', [ $this, 'menu' ] );
-		add_action( 'admin_enqueue_scripts', [ $this, 'assets' ] );
+		add_filter( 'custom_menu_order', [ $this, 'enable_custom_menu_order' ], 999 );
+		add_filter( 'menu_order', [ $this, 'place_after_products' ], PHP_INT_MAX );
+		add_action( 'admin_enqueue_scripts', [ $this, 'assets' ], 20 );
 		add_action( 'admin_post_ysm_adjust', [ $this, 'adjust' ] );
 		add_action( 'admin_post_ysm_export', [ $this, 'export' ] );
 	}
@@ -16,12 +18,33 @@ class YSM_Admin {
 		return [ 'stock_adjustment' => __( 'WooCommerce adjustment', 'yoohw-stock-manager' ), 'order_sale' => __( 'Order sale', 'yoohw-stock-manager' ), 'order_restore' => __( 'Order restore', 'yoohw-stock-manager' ), 'refund_return' => __( 'Refund return', 'yoohw-stock-manager' ) ];
 	}
 	public function menu() {
-		add_menu_page( __( 'Stock Manager', 'yoohw-stock-manager' ), __( 'Stock Manager', 'yoohw-stock-manager' ), 'manage_woocommerce', 'yoohw-stock-manager', [ $this, 'render' ], 'dashicons-products', 56 );
+		add_menu_page( __( 'Stock Manager', 'yoohw-stock-manager' ), __( 'Stock Manager', 'yoohw-stock-manager' ), 'manage_woocommerce', 'yoohw-stock-manager', [ $this, 'render' ], 'none', 56 );
 		foreach ( [ 'yoohw-stock-manager' => __( 'Inventory', 'yoohw-stock-manager' ), 'ysm-history' => __( 'History', 'yoohw-stock-manager' ), 'ysm-help' => __( 'Settings & help', 'yoohw-stock-manager' ) ] as $slug => $label ) {
 			add_submenu_page( 'yoohw-stock-manager', $label, $label, 'manage_woocommerce', $slug, [ $this, 'render' ] );
 		}
 	}
+	public function enable_custom_menu_order( $custom_menu_order ) {
+		return current_user_can( 'manage_woocommerce' ) ? true : $custom_menu_order;
+	}
+	public function place_after_products( $menu_order ) {
+		if ( ! is_array( $menu_order ) || ! in_array( 'yoohw-stock-manager', $menu_order, true ) ) {
+			return $menu_order;
+		}
+		$menu_order = array_values( array_diff( $menu_order, [ 'yoohw-stock-manager' ] ) );
+		// WooCommerce can supply duplicate Products entries; WordPress keeps the last.
+		$products_index = array_search( 'edit.php?post_type=product', array_reverse( $menu_order, true ), true );
+		if ( false === $products_index ) {
+			$menu_order[] = 'yoohw-stock-manager';
+			return $menu_order;
+		}
+		array_splice( $menu_order, $products_index + 1, 0, [ 'yoohw-stock-manager' ] );
+		return $menu_order;
+	}
 	public function assets( $hook ) {
+		if ( current_user_can( 'manage_woocommerce' ) ) {
+			// Use the same glyph as Premium, from WooCommerce's existing menu font.
+			wp_add_inline_style( 'woocommerce_admin_menu_styles', '#adminmenu #toplevel_page_yoohw-stock-manager > a .wp-menu-image::before { content: "\e900"; font-family: "WooCommerce" !important; font-size: 20px; font-weight: 400; line-height: 1; }' );
+		}
 		if ( false !== strpos( $hook, 'yoohw-stock-manager' ) || false !== strpos( $hook, 'ysm-' ) ) {
 			wp_enqueue_style( 'ysm-admin', plugins_url( 'css/admin.css', YSM_FILE ), [], YSM_VERSION );
 			wp_enqueue_script( 'ysm-admin', plugins_url( 'js/admin.js', YSM_FILE ), [], YSM_VERSION, true );
