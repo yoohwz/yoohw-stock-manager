@@ -134,7 +134,7 @@
 }
 .ysm-stock-bulk {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr)) auto;
     align-items: end;
     gap: 10px;
     margin-bottom: 6px;
@@ -164,7 +164,6 @@
 }
 .ysm-stock-metrics { grid-template-columns: repeat(3,minmax(140px,1fr)); }
 .ysm-stock-bulk-field { min-width: 0; }
-.ysm-stock-bulk-actions { grid-column: 1; }
 .ysm-stock-bulk-actions .button { width: 100%; }
 .ysm-stock-bulk-help { margin: 8px 0 14px; }
 .ysm-stock-table-wrap { overflow-x: auto; }
