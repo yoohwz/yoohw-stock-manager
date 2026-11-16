@@ -35,7 +35,7 @@ class YSM_Tracker {
 			return;
 		}
 		$id = $product->get_stock_managed_by_id();
-		$stock = $wpdb->get_var( $wpdb->prepare( "SELECT meta_value FROM {$wpdb->postmeta} WHERE post_id=%d AND meta_key='_stock'", $id ) );
+		$stock = $wpdb->get_var( $wpdb->prepare( "SELECT meta_value FROM {$wpdb->postmeta} WHERE post_id=%d AND meta_key='_stock'", $id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Observe the actual pre-write Woo balance; internal table and prepared ID; product/meta cache may be stale.
 		// The first product save has no previous tracked balance.
 		$this->before[ $id ] = null === $stock || '' === $stock ? null : [ 'quantity' => (float) $stock, 'context' => $this->context() ];
 	}
@@ -48,7 +48,7 @@ class YSM_Tracker {
 		if ( ! $before || YSM_Store::$adjusting || ysm_premium_active() ) {
 			return;
 		}
-		$after = $wpdb->get_var( $wpdb->prepare( "SELECT meta_value FROM {$wpdb->postmeta} WHERE post_id=%d AND meta_key='_stock'", $id ) );
+		$after = $wpdb->get_var( $wpdb->prepare( "SELECT meta_value FROM {$wpdb->postmeta} WHERE post_id=%d AND meta_key='_stock'", $id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Observe the actual post-write Woo balance; internal table and prepared ID; product/meta cache may be stale.
 		if ( null !== $after && abs( (float) $after - $before['quantity'] ) > 0.0000005 ) {
 			if ( ! YSM_Store::record( ysm_owner( $id ), $before['quantity'], (float) $after, $before['context'] ) ) {
 				update_option( 'ysm_history_error', current_time( 'mysql', true ), false );

@@ -1,6 +1,9 @@
 """Negative contracts for the packaged WordPress.org report gate."""
 import importlib.util
 import json
+import subprocess
+import sys
+import tempfile
 from pathlib import Path
 import unittest
 
@@ -24,3 +27,13 @@ class PackageReportTests(unittest.TestCase):
             with self.subTest(text=text):
                 with self.assertRaises(ValueError):
                     pcp.parse_report(text)
+    def test_cli_rejects_errors_and_warnings(self):
+        with tempfile.TemporaryDirectory() as directory:
+            report = Path(directory) / 'report.txt'
+            for text, expected in [('Success: Checks complete. No errors found.\n', 0),
+                                   (self.block('WARNING'), 1), (self.block('ERROR'), 1)]:
+                with self.subTest(report=text):
+                    report.write_text(text)
+                    result = subprocess.run([sys.executable, str(ROOT / 'bin/check-plugin-check.py'), str(report)],
+                                            capture_output=True, text=True)
+                    self.assertEqual(result.returncode, expected, result.stdout + result.stderr)

@@ -119,7 +119,7 @@ class YSM_Admin {
 		fputcsv( $stream, $columns, ',', '"', '' );
 		$table = $history ? YSM_Store::table() : $wpdb->posts;
 		$column = $history ? 'id' : 'ID';
-		$ceiling = (int) $wpdb->get_var( "SELECT MAX($column) FROM $table" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter -- Only internal allowlisted table and column identifiers.
+		$ceiling = (int) $wpdb->get_var( "SELECT MAX($column) FROM $table" ); // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Capture a live export ceiling from the allowlisted internal table/column; cached bounds can omit newly received stock history.
 		$cursor = 0;
 		if ( ! $ceiling ) {
 			return;

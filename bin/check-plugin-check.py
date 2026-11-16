@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fail CI on packaged Plugin Check errors, malformed or incomplete reports."""
+"""Fail CI on packaged Plugin Check findings, malformed or incomplete reports."""
 import json
 from pathlib import Path
 import re
@@ -32,10 +32,10 @@ def main():
         print(f'Invalid Plugin Check report: {error}', file=sys.stderr)
         return 1
     errors = [(file, item) for file, item in records if item['type'] == 'ERROR']
-    for file, item in errors:
+    for file, item in records:
         print(f"{file}:{item['line']}: {item['code']}: {item['message']}")
-    print(f'Plugin Check: {len(errors)} errors; {len(records) - len(errors)} warnings (review required, not hidden).')
-    return int(bool(errors))
+    print(f'Plugin Check: {len(errors)} errors; {len(records) - len(errors)} warnings.')
+    return int(bool(records))
 
 if __name__ == '__main__':
     raise SystemExit(main())

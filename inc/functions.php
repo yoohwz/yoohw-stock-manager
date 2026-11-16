@@ -32,7 +32,7 @@ function ysm_install() {
 		KEY product_date (product_id,created_at_gmt),
 		KEY created_id (created_at_gmt,id)
 	) ENGINE=InnoDB $collate;" );
-	if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->esc_like( $table ) ) ) === $table ) {
+	if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->esc_like( $table ) ) ) === $table ) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Verify the table created by dbDelta now exists; internal table name is escaped for LIKE and prepared; no stale schema cache.
 		update_option( 'ysm_schema_version', '1', false );
 	}
 }
