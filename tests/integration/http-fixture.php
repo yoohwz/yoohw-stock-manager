@@ -18,18 +18,34 @@ if ( 'setup' === $mode ) {
 		$p->save();
 		$ids[] = $p->get_id();
 	}
+	$parent = new WC_Product_Variable();
+	$parent->set_name( 'YSM HTTP shared parent' );
+	$parent->set_manage_stock( true );
+	$parent->set_stock_quantity( 5 );
+	$parent->save();
+	$shared = [];
+	for ( $index = 0; $index < 2; ++$index ) {
+		$variation = new WC_Product_Variation();
+		$variation->set_parent_id( $parent->get_id() );
+		$variation->set_manage_stock( false );
+		$variation->save();
+		$shared[] = $variation->get_id();
+	}
 	$users = [];
-	foreach ( [ 'administrator', 'subscriber' ] as $role ) {
+	foreach ( [ 'administrator', 'subscriber', 'cap_only' ] as $role ) {
 		$login = 'ysm_' . $role . '_' . substr( str_replace( '-', '', wp_generate_uuid4() ), 0, 10 );
 		$id = wp_create_user( $login, getenv( 'YSM_HTTP_PASSWORD' ) );
 		if ( is_wp_error( $id ) ) {
 			throw new RuntimeException( 'HTTP fixture user failed.' );
 		}
 		$user = new WP_User( $id );
-		$user->set_role( $role );
+		$user->set_role( 'cap_only' === $role ? 'subscriber' : $role );
+		if ( 'cap_only' === $role ) {
+			$user->add_cap( 'manage_woocommerce' );
+		}
 		$users[] = [ 'id' => $id, 'login' => $login ];
 	}
-	$data = [ 'products' => $ids, 'users' => $users ];
+	$data = [ 'products' => $ids, 'users' => $users, 'shared_parent' => $parent->get_id(), 'shared_variations' => $shared ];
 	update_option( 'ysm_http_fixture', $data, false );
 	echo wp_json_encode( $data );
 } elseif ( 'verify' === $mode ) {
@@ -39,9 +55,14 @@ if ( 'setup' === $mode ) {
 	if ( 11.0 !== (float) wc_get_product( $id )->get_stock_quantity() || 1 !== YSM_Store::history( [ 'product_id' => $id, 'source' => 'free' ], 25, 0, 0, true ) ) {
 		throw new RuntimeException( 'HTTP replay/denied request changed stock or duplicated history.' );
 	}
+	$parent_id = $data['shared_parent'];
+	YSM_Store::forget( $parent_id );
+	if ( 6.0 !== (float) wc_get_product( $parent_id )->get_stock_quantity() || 1 !== YSM_Store::history( [ 'product_id' => $parent_id, 'source' => 'free' ], 25, 0, 0, true ) ) {
+		throw new RuntimeException( 'Bulk shared owner changed more than once.' );
+	}
 } elseif ( 'cleanup' === $mode ) {
 	$data = get_option( 'ysm_http_fixture' );
-	foreach ( $data['products'] as $id ) {
+	foreach ( array_merge( $data['shared_variations'], [ $data['shared_parent'] ], $data['products'] ) as $id ) {
 		wp_delete_post( $id, true );
 		$wpdb->delete( YSM_Store::table(), [ 'product_id' => $id ] );
 	}

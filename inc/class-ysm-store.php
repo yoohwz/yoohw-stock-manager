@@ -165,7 +165,8 @@ class YSM_Store {
 		$search = $filters['s'] ?? '';
 		if ( '' !== $search ) {
 			$like = '%' . $wpdb->esc_like( $search ) . '%';
-			$where[] = $wpdb->prepare( '(p.post_title LIKE %s OR l.sku LIKE %s OR p.ID = %d OR EXISTS (SELECT 1 FROM ' . $wpdb->posts . ' v LEFT JOIN ' . $wpdb->prefix . "wc_product_meta_lookup vl ON vl.product_id=v.ID WHERE v.post_parent=p.ID AND v.post_type='product_variation' AND (v.ID=%d OR v.post_title LIKE %s OR vl.sku LIKE %s)))", $like, $like, absint( ltrim( $search, '#' ) ), absint( ltrim( $search, '#' ) ), $like, $like );
+			$search_id = preg_match( '/^#?\d+$/D', $search ) ? absint( ltrim( $search, '#' ) ) : 0;
+			$where[] = $wpdb->prepare( '(p.post_title LIKE %s OR l.sku LIKE %s OR p.ID = %d OR EXISTS (SELECT 1 FROM ' . $wpdb->posts . ' v LEFT JOIN ' . $wpdb->prefix . "wc_product_meta_lookup vl ON vl.product_id=v.ID WHERE v.post_parent=p.ID AND v.post_type='product_variation' AND v.post_status IN ('publish','private','draft','pending','future') AND NOT EXISTS (SELECT 1 FROM {$wpdb->postmeta} vm WHERE vm.post_id=v.ID AND vm.meta_key='_manage_stock' AND vm.meta_value='yes') AND (v.ID=%d OR v.post_title LIKE %s OR vl.sku LIKE %s)))", $like, $like, $search_id, $search_id, $like, $like );
 		}
 		if ( ! empty( $filters['category'] ) ) {
 			$children = get_term_children( absint( $filters['category'] ), 'product_cat' );

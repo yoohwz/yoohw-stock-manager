@@ -227,14 +227,20 @@ class YSM_Admin {
 			$this->adjustment_fields();
 			echo '</form></section>';
 		}
-		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
-		if ( ! $history && ! ysm_premium_active() && ! $single ) {
+		$bulk_enabled = ! $history && ! ysm_premium_active() && ! $single;
+		if ( $bulk_enabled ) {
+			echo '<form id="ysm-bulk-adjustment" method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
 			echo '<h2>' . esc_html__( 'Bulk adjustment', 'yoohw-stock-manager' ) . '</h2><p>' . esc_html__( 'Select products below. Apply one operation to up to 25 products per page; repeat on other pages as needed. There is no usage limit.', 'yoohw-stock-manager' ) . '</p><div class="ysm-stock-bulk">';
 			$this->adjustment_fields();
-			echo '</div>';
+			echo '</div></form>';
+		}
+		// Read-only pagination must never submit the stock adjustment form.
+		echo '<form method="get" action="' . esc_url( admin_url( 'admin.php' ) ) . '">';
+		foreach ( array_merge( $filters, [ 'page' => $page ] ) as $key => $value ) {
+			echo '<input type="hidden" name="' . esc_attr( $key ) . '" value="' . esc_attr( $value ) . '">';
 		}
 		echo '<div class="ysm-stock-table-wrap" tabindex="0" role="region" aria-label="' . esc_attr( $history ? __( 'Stock history table', 'yoohw-stock-manager' ) : __( 'Inventory table', 'yoohw-stock-manager' ) ) . '">';
-		$table = new YSM_List_Table( $history, $rows, $total );
+		$table = new YSM_List_Table( $history, $rows, $total, $bulk_enabled );
 		$table->display();
 		echo '</div></form></div>';
 	}

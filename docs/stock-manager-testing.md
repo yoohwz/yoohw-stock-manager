@@ -73,3 +73,20 @@ not also recorded in Free. Deactivating Premium restores Free's observer. Deacti
 and reactivating Free preserves stock/history. A process with WooCommerce skipped boots
 without the Free stock runtime or a fatal error. Local WP 7.1.4 / WC 10.0.4 / PHP 8.4
 also exercised the suite, supporting the readme's Tested up to 7.1 declaration.
+
+## Full feature regression coverage
+
+`tests/integration/inventory-queries.php` creates isolated product/category fixtures to
+verify name/SKU/full-ID searches, inherited versus own-stock variation ownership,
+numeric-leading SKUs, trashed children, category descendants, status/threshold views,
+sorting, page boundaries and inventory CSV across the 250-row cursor boundary. It also
+checks history product/source/reason/date filters at site-timezone day boundaries.
+
+HTTP regression checks native form ownership: the table/pagination GET form owns no
+adjustment fields, while row checkboxes explicitly belong to the separate bulk POST
+form. Enter in Current Page must only navigate; filled bulk fields and selected rows
+must not change stock/history until Apply adjustment is submitted. Verify this browser
+flow with more than 25 products and verify Select all still submits the intended rows.
+The HTTP suite also checks shared-parent bulk deduplication/replay and a user who can
+manage WooCommerce but cannot edit products. Order/refund tests cover shared-parent and
+own-stock variations in addition to simple products.

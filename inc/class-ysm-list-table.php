@@ -6,15 +6,17 @@ if ( ! class_exists( 'WP_List_Table' ) ) {
 }
 class YSM_List_Table extends WP_List_Table {
 	private $history;
-	public function __construct( $history, $rows, $total ) {
+	private $bulk_enabled;
+	public function __construct( $history, $rows, $total, $bulk_enabled = false ) {
 		parent::__construct( [ 'singular' => 'ysm_product', 'plural' => 'ysm_products', 'ajax' => false ] );
 		$this->history = $history;
+		$this->bulk_enabled = ! $history && $bulk_enabled;
 		$this->items = $rows;
 		$this->_column_headers = [ $this->get_columns(), [], $history ? [] : [ 'product' => [ 'name', false ], 'stock' => [ 'stock', false ] ], 'product' ];
 		$this->set_pagination_args( [ 'total_items' => $total, 'per_page' => 25 ] );
 	}
 	public function get_columns() {
-		return $this->history ? [
+		$columns = $this->history ? [
 			'date' => __( 'Date', 'yoohw-stock-manager' ), 'product' => __( 'Product', 'yoohw-stock-manager' ),
 			'change' => __( 'Change', 'yoohw-stock-manager' ), 'balance' => __( 'Before → after', 'yoohw-stock-manager' ),
 			'source' => __( 'Source', 'yoohw-stock-manager' ), 'reason' => __( 'Reason', 'yoohw-stock-manager' ), 'note' => __( 'User / note', 'yoohw-stock-manager' ),
@@ -23,6 +25,10 @@ class YSM_List_Table extends WP_List_Table {
 			'status' => __( 'Status', 'yoohw-stock-manager' ), 'stock' => __( 'WooCommerce stock', 'yoohw-stock-manager' ),
 			'threshold' => __( 'Low stock threshold', 'yoohw-stock-manager' ), 'action' => __( 'Actions', 'yoohw-stock-manager' ),
 		];
+		if ( ! $this->bulk_enabled ) {
+			unset( $columns['cb'] );
+		}
+		return $columns;
 	}
 	protected function get_table_classes() {
 		return array_merge( parent::get_table_classes(), [ 'ysm-stock-manager-table', $this->history ? 'ysm-history-table' : 'ysm-inventory-table' ] );
@@ -32,7 +38,7 @@ class YSM_List_Table extends WP_List_Table {
 	}
 	public function column_cb( $item ) {
 		$product = wc_get_product( $item );
-		return $product && ! ysm_premium_active() && ysm_can_edit( $product ) ? '<input aria-label="' . esc_attr( $product->get_name() ) . '" type="checkbox" name="product_ids[]" value="' . absint( $item ) . '" />' : '';
+		return $this->bulk_enabled && $product && ! ysm_premium_active() && ysm_can_edit( $product ) ? '<input aria-label="' . esc_attr( $product->get_name() ) . '" type="checkbox" form="ysm-bulk-adjustment" name="product_ids[]" value="' . absint( $item ) . '" />' : '';
 	}
 	public function column_default( $item, $column ) {
 		if ( $this->history ) {
