@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-11-16T01:28:07+00:00\n"
+"POT-Creation-Date: 2026-11-16T01:36:18+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.9.0\n"
 "X-Domain: yoohw-stock-manager\n"
@@ -247,37 +247,18 @@ msgid "Export CSV"
 msgstr ""
 
 #: inc/class-ysm-admin.php:226
-#: inc/class-ysm-list-table.php:79
-msgid "Adjust stock"
-msgstr ""
-
-#: inc/class-ysm-admin.php:226
-msgid "Back to inventory"
-msgstr ""
-
-#. translators: %s: current WooCommerce stock quantity.
-#: inc/class-ysm-admin.php:228
-msgid "Current WooCommerce stock: %s"
-msgstr ""
-
-#. translators: %s: current WooCommerce stock quantity.
-#: inc/class-ysm-admin.php:228
-msgid "Choose an operation, enter a quantity and reason, then apply the adjustment."
-msgstr ""
-
-#: inc/class-ysm-admin.php:236
 msgid "Bulk adjustment"
 msgstr ""
 
-#: inc/class-ysm-admin.php:236
+#: inc/class-ysm-admin.php:226
 msgid "Select products below. Apply one operation to up to 25 products per page; repeat on other pages as needed. There is no usage limit."
 msgstr ""
 
-#: inc/class-ysm-admin.php:245
+#: inc/class-ysm-admin.php:235
 msgid "Stock history table"
 msgstr ""
 
-#: inc/class-ysm-admin.php:245
+#: inc/class-ysm-admin.php:235
 msgid "Inventory table"
 msgstr ""
 
@@ -312,10 +293,6 @@ msgstr ""
 
 #: inc/class-ysm-list-table.php:26
 msgid "Low stock threshold"
-msgstr ""
-
-#: inc/class-ysm-list-table.php:26
-msgid "Actions"
 msgstr ""
 
 #: inc/class-ysm-list-table.php:37

@@ -23,7 +23,7 @@ class YSM_List_Table extends WP_List_Table {
 		] : [
 			'cb' => '<input type="checkbox" />', 'product' => __( 'Product', 'yoohw-stock-manager' ),
 			'status' => __( 'Status', 'yoohw-stock-manager' ), 'stock' => __( 'WooCommerce stock', 'yoohw-stock-manager' ),
-			'threshold' => __( 'Low stock threshold', 'yoohw-stock-manager' ), 'action' => __( 'Actions', 'yoohw-stock-manager' ),
+			'threshold' => __( 'Low stock threshold', 'yoohw-stock-manager' ),
 		];
 		if ( ! $this->bulk_enabled ) {
 			unset( $columns['cb'] );
@@ -75,8 +75,7 @@ class YSM_List_Table extends WP_List_Table {
 				return '<span class="ysm-status-pill ysm-status-pill--' . esc_attr( $status ) . '">' . esc_html( wc_get_product_stock_status_options()[ $status ] ?? $status ) . '</span>' . ( $low ? '<div class="ysm-stock-alert-text">' . esc_html__( 'Low stock', 'yoohw-stock-manager' ) . '</div>' : '' );
 			case 'stock': return '<strong>' . esc_html( wc_format_localized_decimal( $product->get_stock_quantity() ) ) . '</strong>';
 			case 'threshold': return esc_html( wc_format_localized_decimal( wc_get_low_stock_amount( $product ) ) );
-			case 'action':
-				return ! ysm_premium_active() && ysm_can_edit( $product ) ? '<a class="button" href="' . esc_url( add_query_arg( [ 'page' => 'yoohw-stock-manager', 'adjust' => $id ], admin_url( 'admin.php' ) ) ) . '#ysm-adjust">' . esc_html__( 'Adjust stock', 'yoohw-stock-manager' ) . '</a>' : '—';
+
 		}
 		return '';
 	}

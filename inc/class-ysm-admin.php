@@ -220,17 +220,7 @@ class YSM_Admin {
 		$paged = isset( $_GET['paged'] ) ? max( 1, absint( $_GET['paged'] ) ) : 1; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only pagination.
 		$rows = $history ? YSM_Store::history( $filters, 25, ( $paged - 1 ) * 25 ) : YSM_Store::inventory( $filters, 25, ( $paged - 1 ) * 25 );
 		$total = $history ? YSM_Store::history( $filters, 25, 0, 0, true ) : YSM_Store::inventory( $filters, 25, 0, true );
-		$adjust = isset( $_GET['adjust'] ) ? absint( $_GET['adjust'] ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only selection.
-		$single = $adjust ? ysm_owner( $adjust ) : false;
-		if ( ! $history && ! ysm_premium_active() && $single && ysm_can_edit( $single ) ) {
-			echo '<section id="ysm-adjust" class="ysm-help ysm-adjust-panel" aria-labelledby="ysm-adjust-title"><div class="ysm-adjust-header"><h2 id="ysm-adjust-title">' . esc_html__( 'Adjust stock', 'yoohw-stock-manager' ) . ': ' . esc_html( $single->get_name() ) . '</h2><a class="button" href="' . esc_url( admin_url( 'admin.php?page=yoohw-stock-manager' ) ) . '">' . esc_html__( 'Back to inventory', 'yoohw-stock-manager' ) . '</a></div>';
-			/* translators: %s: current WooCommerce stock quantity. */
-			echo '<p id="ysm-adjust-context"><strong>' . esc_html( sprintf( __( 'Current WooCommerce stock: %s', 'yoohw-stock-manager' ), wc_format_localized_decimal( $single->get_stock_quantity() ) ) ) . '</strong></p><p>' . esc_html__( 'Choose an operation, enter a quantity and reason, then apply the adjustment.', 'yoohw-stock-manager' ) . '</p>';
-			echo '<form class="ysm-stock-bulk" method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input name="product_ids[]" type="hidden" value="' . absint( $single->get_id() ) . '">';
-			$this->adjustment_fields();
-			echo '</form></section>';
-		}
-		$bulk_enabled = ! $history && ! ysm_premium_active() && ! $single;
+		$bulk_enabled = ! $history && ! ysm_premium_active();
 		if ( $bulk_enabled ) {
 			echo '<form id="ysm-bulk-adjustment" method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
 			echo '<h2>' . esc_html__( 'Bulk adjustment', 'yoohw-stock-manager' ) . '</h2><p>' . esc_html__( 'Select products below. Apply one operation to up to 25 products per page; repeat on other pages as needed. There is no usage limit.', 'yoohw-stock-manager' ) . '</p><div class="ysm-stock-bulk">';

@@ -23,6 +23,8 @@ YoOhw Stock Manager for WooCommerce is a free, standalone inventory workspace.
 * Filtered inventory and movement CSV exports, streamed in chunks.
 * WooCommerce inventory settings and emails remain authoritative; no duplicate email sender.
 
+To adjust one product, select its checkbox in Inventory and use the bulk adjustment bar. The same bar applies one operation to multiple selected products.
+
 Shared parent-managed stock appears once on its parent. Search a variation SKU/ID to find its stock owner. Variation-managed stock appears separately. Increasing stock records goods already received; there are no incoming shipments or purchase orders.
 
 History starts when tracking is active. Standard WooCommerce product saves, stock API changes, order reductions/restores and restocked refunds are observed. Existing historical changes and direct database writes are not reconstructed. Simultaneous external updates can limit observed before/after accuracy.

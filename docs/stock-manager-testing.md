@@ -90,3 +90,9 @@ flow with more than 25 products and verify Select all still submits the intended
 The HTTP suite also checks shared-parent bulk deduplication/replay and a user who can
 manage WooCommerce but cannot edit products. Order/refund tests cover shared-parent and
 own-stock variations in addition to simple products.
+
+
+Inventory follows the Premium selection flow: select one or more rows and submit
+through the bulk bar. There is no Actions column or separate per-product adjustment
+panel. Verify one-row and multiple-row selection through the same POST form, while
+pagination remains a separate read-only GET form.
