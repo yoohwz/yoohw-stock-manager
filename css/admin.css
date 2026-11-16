@@ -188,3 +188,19 @@
  .ysm-stock-manager-table tbody td::before, .ysm-stock-manager-table .toggle-row { display: none !important; }
  .ysm-stock-manager-table tr { display: table-row !important; }
 }
+
+.ysm-adjust-panel {
+    border-color: var(--wp-admin-theme-color, #2271b1);
+    border-left-width: 4px;
+    background: #f0f6fc;
+    scroll-margin-top: calc(var(--wp-admin--admin-bar--height, 32px) + 16px);
+}
+.ysm-adjust-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+.ysm-adjust-header h2 { margin: 0; font-size: 18px; }
+.ysm-adjust-panel .ysm-stock-bulk { margin: 16px 0 0; }
