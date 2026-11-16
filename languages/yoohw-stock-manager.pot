@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-11-16T01:36:18+00:00\n"
+"POT-Creation-Date: 2026-11-16T01:41:49+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.9.0\n"
 "X-Domain: yoohw-stock-manager\n"
@@ -32,7 +32,7 @@ msgstr ""
 
 #: inc/class-ysm-admin.php:15
 #: inc/class-ysm-admin.php:21
-#: inc/class-ysm-admin.php:171
+#: inc/class-ysm-admin.php:172
 msgid "Stock Manager"
 msgstr ""
 
@@ -65,18 +65,18 @@ msgid "Refund return"
 msgstr ""
 
 #: inc/class-ysm-admin.php:22
-#: inc/class-ysm-admin.php:172
+#: inc/class-ysm-admin.php:173
 msgid "Inventory"
 msgstr ""
 
 #: inc/class-ysm-admin.php:22
-#: inc/class-ysm-admin.php:172
+#: inc/class-ysm-admin.php:173
 #: inc/class-ysm-list-table.php:71
 msgid "History"
 msgstr ""
 
 #: inc/class-ysm-admin.php:22
-#: inc/class-ysm-admin.php:172
+#: inc/class-ysm-admin.php:173
 msgid "Settings & help"
 msgstr ""
 
@@ -88,177 +88,176 @@ msgstr ""
 msgid "Select between 1 and 25 products on this page."
 msgstr ""
 
-#: inc/class-ysm-admin.php:159
-msgid "Operation"
-msgstr ""
-
-#: inc/class-ysm-admin.php:159
-msgid "Increase"
-msgstr ""
-
-#: inc/class-ysm-admin.php:159
-msgid "Decrease"
-msgstr ""
-
-#: inc/class-ysm-admin.php:159
-msgid "Set quantity"
+#: inc/class-ysm-admin.php:160
+msgid "Bulk action"
 msgstr ""
 
 #: inc/class-ysm-admin.php:160
-msgid "Quantity"
+msgid "Increase stock"
+msgstr ""
+
+#: inc/class-ysm-admin.php:160
+msgid "Decrease stock"
+msgstr ""
+
+#: inc/class-ysm-admin.php:160
+msgid "Set stock"
 msgstr ""
 
 #: inc/class-ysm-admin.php:161
-#: inc/class-ysm-admin.php:208
-#: inc/class-ysm-list-table.php:22
-msgid "Reason"
+msgid "Quantity"
 msgstr ""
 
 #: inc/class-ysm-admin.php:162
-msgid "Note"
-msgstr ""
-
-#: inc/class-ysm-admin.php:162
-msgid "Note (optional)"
+msgid "Adjustment reason"
 msgstr ""
 
 #: inc/class-ysm-admin.php:163
-msgid "Apply adjustment"
+msgid "Note"
 msgstr ""
 
-#: inc/class-ysm-admin.php:171
+#: inc/class-ysm-admin.php:164
+msgid "Apply to selected"
+msgstr ""
+
+#: inc/class-ysm-admin.php:172
 msgid "Stock Manager navigation"
 msgstr ""
 
-#: inc/class-ysm-admin.php:177
+#: inc/class-ysm-admin.php:178
 msgid "Premium is active. Use Premium to adjust stock. Free tracking is paused; existing Free history remains available to read and export."
 msgstr ""
 
-#: inc/class-ysm-admin.php:180
+#: inc/class-ysm-admin.php:181
 msgid "A WooCommerce stock change could not be recorded. History may be incomplete. Check database health before relying on exports."
 msgstr ""
 
 #. translators: 1: successful count, 2: failed count, 3: skipped count.
-#: inc/class-ysm-admin.php:187
+#: inc/class-ysm-admin.php:188
 msgid "%1$d successful, %2$d failed, %3$d skipped (unchanged or already applied)."
 msgstr ""
 
-#: inc/class-ysm-admin.php:194
+#: inc/class-ysm-admin.php:195
 msgid "Stock settings"
 msgstr ""
 
-#: inc/class-ysm-admin.php:194
+#: inc/class-ysm-admin.php:195
 msgid "WooCommerce controls stock quantities, backorders, low stock thresholds and inventory emails. Stock Manager does not send duplicate alerts."
 msgstr ""
 
-#: inc/class-ysm-admin.php:194
+#: inc/class-ysm-admin.php:195
 msgid "Open WooCommerce inventory settings"
 msgstr ""
 
-#: inc/class-ysm-admin.php:194
+#: inc/class-ysm-admin.php:195
 msgid "Quick start"
 msgstr ""
 
-#: inc/class-ysm-admin.php:194
+#: inc/class-ysm-admin.php:195
 msgid "Enable stock management on products. Use Inventory to search and select products, adjust received goods or counts, then check History and export CSV. Shared parent stock is shown once on the parent; search a variation SKU or ID to find its owner."
 msgstr ""
 
-#: inc/class-ysm-admin.php:194
+#: inc/class-ysm-admin.php:195
 msgid "Tracking starts when this plugin is active. Standard WooCommerce stock updates, order reductions/restores and restocked refunds are observed. Direct database writes and historical changes are not reconstructed. Concurrent external writers can limit observed before/after accuracy. Deactivation or uninstall keeps Free history; Premium activation pauses Free tracking and adjustments."
 msgstr ""
 
-#: inc/class-ysm-admin.php:199
+#: inc/class-ysm-admin.php:200
 msgid "Stock-managed products"
 msgstr ""
 
-#: inc/class-ysm-admin.php:199
-#: inc/class-ysm-admin.php:214
+#: inc/class-ysm-admin.php:200
+#: inc/class-ysm-admin.php:215
 #: inc/class-ysm-list-table.php:75
 msgid "Low stock"
 msgstr ""
 
-#: inc/class-ysm-admin.php:199
+#: inc/class-ysm-admin.php:200
 msgid "Out of stock"
 msgstr ""
 
-#: inc/class-ysm-admin.php:202
+#: inc/class-ysm-admin.php:203
 msgid "WooCommerce stock is the current tracked quantity. Shared stock is counted once. Increase stock only for goods already received."
 msgstr ""
 
-#: inc/class-ysm-admin.php:206
+#: inc/class-ysm-admin.php:207
 msgid "Product ID"
 msgstr ""
 
-#: inc/class-ysm-admin.php:207
+#: inc/class-ysm-admin.php:208
 #: inc/class-ysm-list-table.php:22
 msgid "Source"
 msgstr ""
 
-#: inc/class-ysm-admin.php:207
+#: inc/class-ysm-admin.php:208
 msgid "All sources"
 msgstr ""
 
-#: inc/class-ysm-admin.php:208
+#: inc/class-ysm-admin.php:209
+#: inc/class-ysm-list-table.php:22
+msgid "Reason"
+msgstr ""
+
+#: inc/class-ysm-admin.php:209
 msgid "All reasons"
 msgstr ""
 
-#: inc/class-ysm-admin.php:209
+#: inc/class-ysm-admin.php:210
 msgid "From date"
 msgstr ""
 
-#: inc/class-ysm-admin.php:209
+#: inc/class-ysm-admin.php:210
 msgid "To date"
 msgstr ""
 
-#: inc/class-ysm-admin.php:213
+#: inc/class-ysm-admin.php:214
 msgid "Product, SKU, or ID"
 msgstr ""
 
-#: inc/class-ysm-admin.php:213
+#: inc/class-ysm-admin.php:214
 msgid "Product, SKU, or ID…"
 msgstr ""
 
-#: inc/class-ysm-admin.php:214
+#: inc/class-ysm-admin.php:215
 msgid "Stock status"
 msgstr ""
 
-#: inc/class-ysm-admin.php:214
+#: inc/class-ysm-admin.php:215
 msgid "All stock statuses"
 msgstr ""
 
-#: inc/class-ysm-admin.php:215
+#: inc/class-ysm-admin.php:216
 msgid "Category"
 msgstr ""
 
-#: inc/class-ysm-admin.php:215
+#: inc/class-ysm-admin.php:216
 msgid "All categories"
 msgstr ""
 
-#: inc/class-ysm-admin.php:217
+#: inc/class-ysm-admin.php:218
 msgid "Filter"
 msgstr ""
 
-#: inc/class-ysm-admin.php:217
+#: inc/class-ysm-admin.php:218
 msgid "Reset"
 msgstr ""
 
-#: inc/class-ysm-admin.php:219
+#: inc/class-ysm-admin.php:220
 msgid "Export CSV"
 msgstr ""
 
-#: inc/class-ysm-admin.php:226
+#: inc/class-ysm-admin.php:227
 msgid "Bulk adjustment"
 msgstr ""
 
-#: inc/class-ysm-admin.php:226
+#: inc/class-ysm-admin.php:229
 msgid "Select products below. Apply one operation to up to 25 products per page; repeat on other pages as needed. There is no usage limit."
 msgstr ""
 
-#: inc/class-ysm-admin.php:235
+#: inc/class-ysm-admin.php:236
 msgid "Stock history table"
 msgstr ""
 
-#: inc/class-ysm-admin.php:235
+#: inc/class-ysm-admin.php:236
 msgid "Inventory table"
 msgstr ""
 

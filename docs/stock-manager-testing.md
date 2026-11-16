@@ -85,7 +85,7 @@ checks history product/source/reason/date filters at site-timezone day boundarie
 HTTP regression checks native form ownership: the table/pagination GET form owns no
 adjustment fields, while row checkboxes explicitly belong to the separate bulk POST
 form. Enter in Current Page must only navigate; filled bulk fields and selected rows
-must not change stock/history until Apply adjustment is submitted. Verify this browser
+must not change stock/history until Apply to selected is submitted. Verify this browser
 flow with more than 25 products and verify Select all still submits the intended rows.
 The HTTP suite also checks shared-parent bulk deduplication/replay and a user who can
 manage WooCommerce but cannot edit products. Order/refund tests cover shared-parent and

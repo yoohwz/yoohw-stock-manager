@@ -146,8 +146,8 @@ class YSM_Admin {
 			}
 		} while ( count( $rows ) === 250 );
 	}
-	private function select( $name, $label, array $options, $value, $required = false ) {
-		echo '<label class="screen-reader-text" for="ysm-' . esc_attr( $name ) . '">' . esc_html( $label ) . '</label><select id="ysm-' . esc_attr( $name ) . '" name="' . esc_attr( $name ) . '"' . ( $required ? ' required' : '' ) . '>';
+	private function select( $name, $label, array $options, $value, $required = false, $visible_label = false ) {
+		echo '<label class="' . ( $visible_label ? '' : 'screen-reader-text' ) . '" for="ysm-' . esc_attr( $name ) . '">' . esc_html( $label ) . '</label><select id="ysm-' . esc_attr( $name ) . '" name="' . esc_attr( $name ) . '"' . ( $required ? ' required' : '' ) . '>';
 		foreach ( $options as $key => $text ) {
 			echo '<option value="' . esc_attr( $key ) . '" ' . selected( $value, $key, false ) . '>' . esc_html( $text ) . '</option>';
 		}
@@ -156,11 +156,12 @@ class YSM_Admin {
 	private function adjustment_fields() {
 		wp_nonce_field( 'ysm_adjust', 'ysm_nonce' );
 		echo '<input type="hidden" name="action" value="ysm_adjust"><input type="hidden" name="operation_uuid" value="' . esc_attr( wp_generate_uuid4() ) . '">';
-		$this->select( 'operation', __( 'Operation', 'yoohw-stock-manager' ), [ 'increase' => __( 'Increase', 'yoohw-stock-manager' ), 'decrease' => __( 'Decrease', 'yoohw-stock-manager' ), 'set' => __( 'Set quantity', 'yoohw-stock-manager' ) ], 'increase', true );
-		echo '<label class="screen-reader-text" for="ysm-quantity">' . esc_html__( 'Quantity', 'yoohw-stock-manager' ) . '</label><input id="ysm-quantity" name="quantity" type="number" step="any" required placeholder="' . esc_attr__( 'Quantity', 'yoohw-stock-manager' ) . '">';
-		$this->select( 'reason', __( 'Reason', 'yoohw-stock-manager' ), ysm_reasons(), 'manual_adjustment', true );
-		echo '<label class="screen-reader-text" for="ysm-note">' . esc_html__( 'Note', 'yoohw-stock-manager' ) . '</label><input id="ysm-note" name="note" type="text" placeholder="' . esc_attr__( 'Note (optional)', 'yoohw-stock-manager' ) . '">';
-		echo '<button type="submit" class="button button-primary">' . esc_html__( 'Apply adjustment', 'yoohw-stock-manager' ) . '</button>';
+		echo '<div class="ysm-stock-bulk-field">';
+		$this->select( 'operation', __( 'Bulk action', 'yoohw-stock-manager' ), [ 'increase' => __( 'Increase stock', 'yoohw-stock-manager' ), 'decrease' => __( 'Decrease stock', 'yoohw-stock-manager' ), 'set' => __( 'Set stock', 'yoohw-stock-manager' ) ], 'increase', true, true );
+		echo '</div><div class="ysm-stock-bulk-field"><label for="ysm-quantity">' . esc_html__( 'Quantity', 'yoohw-stock-manager' ) . '</label><input id="ysm-quantity" name="quantity" type="number" step="any" required></div><div class="ysm-stock-bulk-field">';
+		$this->select( 'reason', __( 'Adjustment reason', 'yoohw-stock-manager' ), ysm_reasons(), 'manual_adjustment', true, true );
+		echo '</div><div class="ysm-stock-bulk-field"><label for="ysm-note">' . esc_html__( 'Note', 'yoohw-stock-manager' ) . '</label><input id="ysm-note" name="note" type="text"></div>';
+		echo '<div class="ysm-stock-bulk-actions"><button type="submit" class="button button-primary">' . esc_html__( 'Apply to selected', 'yoohw-stock-manager' ) . '</button></div>';
 	}
 	public function render() {
 		$this->permission();
@@ -223,9 +224,9 @@ class YSM_Admin {
 		$bulk_enabled = ! $history && ! ysm_premium_active();
 		if ( $bulk_enabled ) {
 			echo '<form id="ysm-bulk-adjustment" method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
-			echo '<h2>' . esc_html__( 'Bulk adjustment', 'yoohw-stock-manager' ) . '</h2><p>' . esc_html__( 'Select products below. Apply one operation to up to 25 products per page; repeat on other pages as needed. There is no usage limit.', 'yoohw-stock-manager' ) . '</p><div class="ysm-stock-bulk">';
+			echo '<h2>' . esc_html__( 'Bulk adjustment', 'yoohw-stock-manager' ) . '</h2><div class="ysm-stock-bulk">';
 			$this->adjustment_fields();
-			echo '</div></form>';
+			echo '</div><p class="ysm-stock-bulk-help">' . esc_html__( 'Select products below. Apply one operation to up to 25 products per page; repeat on other pages as needed. There is no usage limit.', 'yoohw-stock-manager' ) . '</p></form>';
 		}
 		// Read-only pagination must never submit the stock adjustment form.
 		echo '<form method="get" action="' . esc_url( admin_url( 'admin.php' ) ) . '">';
