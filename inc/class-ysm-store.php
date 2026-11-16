@@ -24,7 +24,7 @@ class YSM_Store {
 
 	public static function record( $product, $before, $after, array $context ) {
 		global $wpdb;
-		return $wpdb->insert( self::table(), array_merge( [
+		return $wpdb->insert( self::table(), array_merge( [ // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Custom movement table insert has no WordPress storage API; wpdb::insert escapes values.
 			'operation_key' => wp_generate_uuid4(), 'payload_hash' => '',
 			'product_id' => $product->get_id(), 'product_name' => $product->get_name(), 'sku' => $product->get_sku(),
 			'stock_before' => $before, 'stock_after' => $after, 'quantity_delta' => $after - $before,
@@ -57,40 +57,40 @@ class YSM_Store {
 		// caller work or relying on MariaDB-only @@in_transaction.
 		$quiet = $wpdb->suppress_errors( true );
 		$probe = 'ysm_probe_' . substr( str_replace( '-', '', wp_generate_uuid4() ), 0, 16 );
-		$savepoint = $wpdb->query( "SAVEPOINT $probe" ); // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter,WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Internally generated hex-only savepoint identifier; no request data.
-		$active = $wpdb->query( "ROLLBACK TO SAVEPOINT $probe" ); // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter,WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Internally generated hex-only savepoint identifier.
+		$savepoint = $wpdb->query( "SAVEPOINT $probe" ); // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Transaction probe must execute against the live connection; generated hex-only identifier.
+		$active = $wpdb->query( "ROLLBACK TO SAVEPOINT $probe" ); // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Transaction probe must execute against the live connection; generated hex-only identifier.
 		$missing = 1305 === mysqli_errno( $wpdb->dbh ); // phpcs:ignore WordPress.DB.RestrictedFunctions -- wpdb exposes no error-number API; distinguish missing savepoint from connection failure.
 		if ( false !== $active ) {
-			$wpdb->query( "RELEASE SAVEPOINT $probe" ); // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter,WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Internally generated hex-only identifier.
+			$wpdb->query( "RELEASE SAVEPOINT $probe" ); // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Release the live transaction probe; generated hex-only identifier.
 		}
 		$wpdb->suppress_errors( $quiet );
 		if ( false === $savepoint || false !== $active || ! $missing ) {
 			return new WP_Error( 'ysm_transaction', __( 'Stock adjustment requires an independent transaction.', 'yoohw-stock-manager' ) );
 		}
 		foreach ( [ $wpdb->posts, $wpdb->postmeta, $wpdb->prefix . 'wc_product_meta_lookup', self::table() ] as $table ) {
-			$engine = $wpdb->get_var( $wpdb->prepare( 'SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = %s', $table ) );
+			$engine = $wpdb->get_var( $wpdb->prepare( 'SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = %s', $table ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Live engine check guards transaction safety; table name is a prepared value.
 			if ( 'InnoDB' !== $engine ) {
 				return new WP_Error( 'ysm_engine', __( 'Stock adjustment requires InnoDB storage.', 'yoohw-stock-manager' ) );
 			}
 		}
-		if ( false === $wpdb->query( 'START TRANSACTION' ) ) {
+		if ( false === $wpdb->query( 'START TRANSACTION' ) ) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Transaction command must execute directly and must never be cached.
 			return new WP_Error( 'ysm_transaction', __( 'The stock transaction could not start.', 'yoohw-stock-manager' ) );
 		}
 		self::$adjusting = true;
 		try {
-			$rows = $wpdb->get_col( $wpdb->prepare( "SELECT meta_value FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key = '_stock' FOR UPDATE", $id ) );
+			$rows = $wpdb->get_col( $wpdb->prepare( "SELECT meta_value FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key = '_stock' FOR UPDATE", $id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Lock the current Woo stock row; prepared product ID and internal table; cache would bypass the lock.
 			if ( 1 !== count( $rows ) || null === ysm_quantity( $rows[0] ) ) {
 				throw new RuntimeException( 'invalid_stock' );
 			}
 			$before = (float) $rows[0];
 			// Locking read sees receipts committed while this request waited for stock.
 			$history_table = self::table();
-			$receipt = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $history_table WHERE operation_key = %s FOR UPDATE", $key ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Internal prefixed table name.
+			$receipt = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $history_table WHERE operation_key = %s FOR UPDATE", $key ) ); // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Lock the live receipt in our internal prefixed table; operation key is prepared; cached receipts break replay safety.
 			if ( $receipt ) {
 				if ( ! hash_equals( $receipt->payload_hash, $hash ) ) {
 					throw new RuntimeException( 'operation_conflict' );
 				}
-				if ( false === $wpdb->query( 'COMMIT' ) ) {
+				if ( false === $wpdb->query( 'COMMIT' ) ) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Commit the live transaction; no request data or cache.
 					throw new RuntimeException( 'commit_failed' );
 				}
 				return 'skipped';
@@ -105,24 +105,24 @@ class YSM_Store {
 			if ( $expected !== $before ) {
 				wc_update_product_stock( $product, $quantity, $operation );
 			}
-			$after = $wpdb->get_var( $wpdb->prepare( "SELECT meta_value FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key = '_stock'", $id ) );
+			$after = $wpdb->get_var( $wpdb->prepare( "SELECT meta_value FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key = '_stock'", $id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Verify the actual stock write inside the transaction; internal table and prepared product ID; no cached values.
 			if ( null === $after || abs( (float) $after - $expected ) > 0.0000005 ) {
 				throw new RuntimeException( 'stock_write_failed' );
 			}
-			$lookup = $wpdb->get_row( $wpdb->prepare( "SELECT stock_quantity, stock_status FROM {$wpdb->prefix}wc_product_meta_lookup WHERE product_id=%d", $id ) );
-			$status = $wpdb->get_var( $wpdb->prepare( "SELECT meta_value FROM {$wpdb->postmeta} WHERE post_id=%d AND meta_key='_stock_status'", $id ) );
+			$lookup = $wpdb->get_row( $wpdb->prepare( "SELECT stock_quantity, stock_status FROM {$wpdb->prefix}wc_product_meta_lookup WHERE product_id=%d", $id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Verify the actual Woo lookup write inside the transaction; internal table and prepared product ID; no cached values.
+			$status = $wpdb->get_var( $wpdb->prepare( "SELECT meta_value FROM {$wpdb->postmeta} WHERE post_id=%d AND meta_key='_stock_status'", $id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Verify the actual stock status write inside the transaction; internal table and prepared product ID; no cached values.
 			if ( ! $lookup || null === $lookup->stock_quantity || abs( (float) $lookup->stock_quantity - $expected ) > 0.0000005 || $lookup->stock_status !== $product->get_stock_status() || $status !== $product->get_stock_status() ) {
 				throw new RuntimeException( 'stock_lookup_write_failed' );
 			}
 			if ( ! self::record( $product, $before, (float) $after, [ 'operation_key' => $key, 'payload_hash' => $hash, 'source' => 'free', 'reason' => $reason, 'note' => $note ] ) ) {
 				throw new RuntimeException( 'history_write_failed' );
 			}
-			if ( false === $wpdb->query( 'COMMIT' ) ) {
+			if ( false === $wpdb->query( 'COMMIT' ) ) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Commit the live transaction; no request data or cache.
 				throw new RuntimeException( 'commit_failed' );
 			}
 			return $expected === $before ? 'skipped' : 'success';
 		} catch ( Throwable $error ) {
-			$wpdb->query( 'ROLLBACK' );
+			$wpdb->query( 'ROLLBACK' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Roll back the live transaction; no request data or cache.
 			return new WP_Error( 'ysm_adjust_failed', __( 'The stock adjustment could not be completed. Refresh stock and retry.', 'yoohw-stock-manager' ) );
 		} finally {
 			self::$adjusting = false;
@@ -135,13 +135,13 @@ class YSM_Store {
 		$where = [ 'quantity_delta <> 0' ];
 		foreach ( [ 'product_id' => '%d', 'source' => '%s', 'reason' => '%s' ] as $key => $format ) {
 			if ( ! empty( $filters[ $key ] ) ) {
-				$where[] = $wpdb->prepare( "$key = $format", $filters[ $key ] );
+				$where[] = $wpdb->prepare( "$key = $format", $filters[ $key ] ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- Column and placeholder are from the literal allowlist above; filter value is prepared.
 			}
 		}
 		foreach ( [ 'date_from' => '>=', 'date_to' => '<=' ] as $key => $operator ) {
 			if ( ! empty( $filters[ $key ] ) && preg_match( '/^\d{4}-\d{2}-\d{2}$/D', $filters[ $key ] ) ) {
 				$date = get_gmt_from_date( $filters[ $key ] . ( 'date_from' === $key ? ' 00:00:00' : ' 23:59:59' ) );
-				$where[] = $wpdb->prepare( "created_at_gmt $operator %s", $date );
+				$where[] = $wpdb->prepare( "created_at_gmt $operator %s", $date ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Comparison operator is from the literal allowlist above; date value is prepared.
 			}
 		}
 		if ( $after_id ) {
@@ -152,10 +152,10 @@ class YSM_Store {
 		}
 		$sql = 'SELECT ' . ( $count ? 'COUNT(*)' : '*' ) . ' FROM ' . self::table() . ' WHERE ' . implode( ' AND ', $where );
 		if ( $count ) {
-			return (int) $wpdb->get_var( $sql ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Conditions individually prepared.
+			return (int) $wpdb->get_var( $sql ); // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared -- Custom-table count; conditions individually prepared above; live history must include external Woo writes.
 		}
 		$sql .= $after_id || $ceiling ? ' ORDER BY id ASC' : ' ORDER BY id DESC';
-		return $wpdb->get_results( $sql . $wpdb->prepare( ' LIMIT %d OFFSET %d', $limit, $offset ), ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Conditions individually prepared.
+		return $wpdb->get_results( $sql . $wpdb->prepare( ' LIMIT %d OFFSET %d', $limit, $offset ), ARRAY_A ); // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared -- Custom-table cursor read; conditions and limits prepared above; live history must include external Woo writes.
 	}
 
 	/** One row per stock owner; inherited variations are represented by the parent. */
@@ -187,13 +187,13 @@ class YSM_Store {
 		}
 		$sql = ' FROM ' . $wpdb->posts . ' p JOIN ' . $wpdb->postmeta . ' m ON p.ID=m.post_id LEFT JOIN ' . $wpdb->prefix . "wc_product_meta_lookup l ON l.product_id=p.ID LEFT JOIN {$wpdb->postmeta} low ON low.post_id=p.ID AND low.meta_key='_low_stock_amount' LEFT JOIN {$wpdb->postmeta} plow ON plow.post_id=p.post_parent AND plow.meta_key='_low_stock_amount' WHERE " . implode( ' AND ', $where );
 		if ( $count ) {
-			return (int) $wpdb->get_var( 'SELECT COUNT(DISTINCT p.ID)' . $sql ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Prepared conditions, internal identifiers.
+			return (int) $wpdb->get_var( 'SELECT COUNT(DISTINCT p.ID)' . $sql ); // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared -- Internal Woo tables and prepared filter clauses above; category IDs integer-cast; live counts include external Woo writes.
 		}
 		$sorts = [ 'name' => 'p.post_title', 'stock' => 'l.stock_quantity', 'id' => 'p.ID' ];
 		$sort = $sorts[ $filters['orderby'] ?? 'name' ] ?? 'p.post_title';
 		$order = 'desc' === ( $filters['order'] ?? '' ) ? 'DESC' : 'ASC';
 		$sort = $ceiling ? 'p.ID' : $sort;
 		$order = $ceiling ? 'ASC' : $order;
-		return $wpdb->get_col( 'SELECT DISTINCT p.ID, ' . $sort . $sql . " ORDER BY $sort $order, p.ID $order" . $wpdb->prepare( ' LIMIT %d OFFSET %d', $limit, $offset ) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Allowlisted sort, prepared conditions.
+		return $wpdb->get_col( 'SELECT DISTINCT p.ID, ' . $sort . $sql . " ORDER BY $sort $order, p.ID $order" . $wpdb->prepare( ' LIMIT %d OFFSET %d', $limit, $offset ) ); // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQL.NotPrepared -- Internal Woo tables, allowlisted sort/direction and prepared filter/limit clauses above; live stock includes external Woo writes.
 	}
 }

@@ -47,11 +47,16 @@ WP_List_Table nonce collision regression, absent nonce, subscriber-denied mutati
 history/export permissions, filtered export and CSV formula neutralization.
 Stock tests inject history, lookup and status SQL failures and reject nested transactions.
 
-Plugin Check warnings for direct database reads/writes and assembled SQL are reviewed
-against allowlists/prepared values. Live balances, row locks and cursor reads deliberately
-bypass object caches. Table/column/sort identifiers and operators are internal allowlists;
-request values are prepared. Warnings are reported, not treated as a clean warning-free
-scan. The CI parser fails any packaged ERROR or unrecognized/truncated result format.
+Plugin Check must report zero errors and zero warnings for the review ZIP. The CI
+parser rejects either finding type and unrecognized/truncated report formats.
+Direct database operations and assembled SQL have narrowly scoped `phpcs:ignore`
+annotations at the audited statement, each with its reason. These are explicit
+exceptions, not evidence that SQL/cache checks are inapplicable to future changes:
+custom movement storage has no WordPress storage API; transaction commands and row
+locks must reach the live connection; observed balances, export bounds and history
+must include external Woo writes. Identifiers/operators are internal allowlists and
+request values are prepared. Never add caching to a lock/verification read just to
+satisfy a scanner, or disable a check globally. Re-review the rationale if the query changes.
 
 ## Local UI and lifecycle evidence
 
