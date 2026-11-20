@@ -1,5 +1,5 @@
 === YoOhw Stock Manager for WooCommerce ===
-Contributors: yoohwz
+Contributors: yoohw
 Tags: woocommerce, inventory, stock, stock manager
 Requires at least: 6.3
 Tested up to: 7.1
