@@ -159,7 +159,7 @@ jobs:
           wp plugin install woocommerce --path="$WP_PATH" --version="$WC_VERSION" --activate
           ln -s "$GITHUB_WORKSPACE" "$WP_PATH/wp-content/plugins/yoohw-stock-manager"
           wp plugin activate yoohw-stock-manager --path="$WP_PATH"
-          wp option update ysm_disposable_tests 1 --path="$WP_PATH"
+          wp option update yoohwsm_disposable_tests 1 --path="$WP_PATH"
           if [ "$ORDER_STORAGE" = "hpos" ]; then
             wp option update woocommerce_custom_orders_table_enabled yes --path="$WP_PATH"
             wp option update woocommerce_custom_orders_table_data_sync_enabled yes --path="$WP_PATH"
@@ -181,22 +181,22 @@ jobs:
 
       - name: Run Stock Manager regression suite
         env:
-          YSM_TEST_PHP_BIN: php
-          YSM_TEST_WP_CLI: wp
-          YSM_TEST_WP_PATH: ${{ runner.temp }}/wordpress
+          YOOHWSM_TEST_PHP_BIN: php
+          YOOHWSM_TEST_WP_CLI: wp
+          YOOHWSM_TEST_WP_PATH: ${{ runner.temp }}/wordpress
         run: bash tests/run-stock-manager-suite.sh
 
       - name: Run smoke checks
-        run: wp --path="${{ runner.temp }}/wordpress" eval-file "$GITHUB_WORKSPACE/tests/smoke/ysm-smoke.php"
+        run: wp --path="${{ runner.temp }}/wordpress" eval-file "$GITHUB_WORKSPACE/tests/smoke/yoohwsm-smoke.php"
 
       - name: Check WordPress.org review package
         if: ${{ matrix.php == '8.2' }}
         run: |
-          python3 bin/build-package.py "$RUNNER_TEMP/ysm-review.zip"
-          mkdir -p "$RUNNER_TEMP/ysm-dist"
-          unzip -q "$RUNNER_TEMP/ysm-review.zip" -d "$RUNNER_TEMP/ysm-dist"
+          python3 bin/build-package.py "$RUNNER_TEMP/yoohwsm-review.zip"
+          mkdir -p "$RUNNER_TEMP/yoohwsm-dist"
+          unzip -q "$RUNNER_TEMP/yoohwsm-review.zip" -d "$RUNNER_TEMP/yoohwsm-dist"
           wp plugin install plugin-check --version=2.2.0 --activate --path="${{ runner.temp }}/wordpress"
-          wp plugin check "$RUNNER_TEMP/ysm-dist/yoohw-stock-manager" --path="${{ runner.temp }}/wordpress" --format=json > "$RUNNER_TEMP/plugin-check.txt"
+          wp plugin check "$RUNNER_TEMP/yoohwsm-dist/yoohw-stock-manager" --path="${{ runner.temp }}/wordpress" --format=json > "$RUNNER_TEMP/plugin-check.txt"
           python3 bin/check-plugin-check.py "$RUNNER_TEMP/plugin-check.txt"
 
   ci-gate:

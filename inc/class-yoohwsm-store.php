@@ -2,12 +2,12 @@
 /** WooCommerce-backed inventory and retained movement storage. @package YoOhwStockManager */
 defined( 'ABSPATH' ) || exit;
 
-class YSM_Store {
+class YOOHWSM_Store {
 	public static $adjusting = false;
 
 	public static function table() {
 		global $wpdb;
-		return $wpdb->prefix . 'ysm_movements';
+		return $wpdb->prefix . 'yoohwsm_movements';
 	}
 
 	public static function forget( $id ) {
@@ -36,13 +36,13 @@ class YSM_Store {
 	/** Receipt, Woo stock and history share the same transaction. */
 	public static function adjust( $id, $operation, $raw_quantity, $reason, $note, $uuid ) {
 		global $wpdb;
-		$product = ysm_owner( $id );
-		if ( ysm_premium_active() || ! $product || ! ysm_can_edit( $product ) || ! $product->managing_stock() ) {
-			return new WP_Error( 'ysm_denied', __( 'Stock adjustment is unavailable for this product.', 'yoohw-stock-manager' ) );
+		$product = yoohwsm_owner( $id );
+		if ( ! defined( 'YOOHWSM_STORAGE_READY' ) || ! YOOHWSM_STORAGE_READY || yoohwsm_premium_active() || ! $product || ! yoohwsm_can_edit( $product ) || ! $product->managing_stock() ) {
+			return new WP_Error( 'yoohwsm_denied', __( 'Stock adjustment is unavailable for this product.', 'yoohw-stock-manager' ) );
 		}
-		$quantity = ysm_quantity( $raw_quantity );
-		if ( null === $quantity || ! in_array( $operation, [ 'set', 'increase', 'decrease' ], true ) || ( 'set' !== $operation && $quantity <= 0 ) || ! isset( ysm_reasons()[ $reason ] ) || ! preg_match( '/^[a-f0-9-]{36}$/D', $uuid ) ) {
-			return new WP_Error( 'ysm_invalid', __( 'Check the operation, quantity and reason.', 'yoohw-stock-manager' ) );
+		$quantity = yoohwsm_quantity( $raw_quantity );
+		if ( null === $quantity || ! in_array( $operation, [ 'set', 'increase', 'decrease' ], true ) || ( 'set' !== $operation && $quantity <= 0 ) || ! isset( yoohwsm_reasons()[ $reason ] ) || ! preg_match( '/^[a-f0-9-]{36}$/D', $uuid ) ) {
+			return new WP_Error( 'yoohwsm_invalid', __( 'Check the operation, quantity and reason.', 'yoohw-stock-manager' ) );
 		}
 		$id = $product->get_id();
 		$key = hash( 'sha256', $uuid . ':' . $id );
@@ -50,13 +50,13 @@ class YSM_Store {
 		$hash = hash( 'sha256', wp_json_encode( [ get_current_user_id(), $operation, $quantity, $reason, $note ] ) );
 		// Reject nested transactions; do not commit a caller's pending work.
 		if ( ! $wpdb->dbh instanceof mysqli ) {
-			return new WP_Error( 'ysm_transaction', __( 'Stock adjustment requires a supported database connection.', 'yoohw-stock-manager' ) );
+			return new WP_Error( 'yoohwsm_transaction', __( 'Stock adjustment requires a supported database connection.', 'yoohw-stock-manager' ) );
 		}
 		// SAVEPOINT is a no-op outside a transaction; only an existing transaction
 		// can roll back to it. This works on MySQL and MariaDB without committing
 		// caller work or relying on MariaDB-only @@in_transaction.
 		$quiet = $wpdb->suppress_errors( true );
-		$probe = 'ysm_probe_' . substr( str_replace( '-', '', wp_generate_uuid4() ), 0, 16 );
+		$probe = 'yoohwsm_probe_' . substr( str_replace( '-', '', wp_generate_uuid4() ), 0, 16 );
 		$savepoint = $wpdb->query( "SAVEPOINT $probe" ); // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Transaction probe must execute against the live connection; generated hex-only identifier.
 		$active = $wpdb->query( "ROLLBACK TO SAVEPOINT $probe" ); // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Transaction probe must execute against the live connection; generated hex-only identifier.
 		$missing = 1305 === mysqli_errno( $wpdb->dbh ); // phpcs:ignore WordPress.DB.RestrictedFunctions -- wpdb exposes no error-number API; distinguish missing savepoint from connection failure.
@@ -65,21 +65,21 @@ class YSM_Store {
 		}
 		$wpdb->suppress_errors( $quiet );
 		if ( false === $savepoint || false !== $active || ! $missing ) {
-			return new WP_Error( 'ysm_transaction', __( 'Stock adjustment requires an independent transaction.', 'yoohw-stock-manager' ) );
+			return new WP_Error( 'yoohwsm_transaction', __( 'Stock adjustment requires an independent transaction.', 'yoohw-stock-manager' ) );
 		}
 		foreach ( [ $wpdb->posts, $wpdb->postmeta, $wpdb->prefix . 'wc_product_meta_lookup', self::table() ] as $table ) {
 			$engine = $wpdb->get_var( $wpdb->prepare( 'SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = %s', $table ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Live engine check guards transaction safety; table name is a prepared value.
 			if ( 'InnoDB' !== $engine ) {
-				return new WP_Error( 'ysm_engine', __( 'Stock adjustment requires InnoDB storage.', 'yoohw-stock-manager' ) );
+				return new WP_Error( 'yoohwsm_engine', __( 'Stock adjustment requires InnoDB storage.', 'yoohw-stock-manager' ) );
 			}
 		}
 		if ( false === $wpdb->query( 'START TRANSACTION' ) ) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Transaction command must execute directly and must never be cached.
-			return new WP_Error( 'ysm_transaction', __( 'The stock transaction could not start.', 'yoohw-stock-manager' ) );
+			return new WP_Error( 'yoohwsm_transaction', __( 'The stock transaction could not start.', 'yoohw-stock-manager' ) );
 		}
 		self::$adjusting = true;
 		try {
 			$rows = $wpdb->get_col( $wpdb->prepare( "SELECT meta_value FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key = '_stock' FOR UPDATE", $id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Lock the current Woo stock row; prepared product ID and internal table; cache would bypass the lock.
-			if ( 1 !== count( $rows ) || null === ysm_quantity( $rows[0] ) ) {
+			if ( 1 !== count( $rows ) || null === yoohwsm_quantity( $rows[0] ) ) {
 				throw new RuntimeException( 'invalid_stock' );
 			}
 			$before = (float) $rows[0];
@@ -123,7 +123,7 @@ class YSM_Store {
 			return $expected === $before ? 'skipped' : 'success';
 		} catch ( Throwable $error ) {
 			$wpdb->query( 'ROLLBACK' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Roll back the live transaction; no request data or cache.
-			return new WP_Error( 'ysm_adjust_failed', __( 'The stock adjustment could not be completed. Refresh stock and retry.', 'yoohw-stock-manager' ) );
+			return new WP_Error( 'yoohwsm_adjust_failed', __( 'The stock adjustment could not be completed. Refresh stock and retry.', 'yoohw-stock-manager' ) );
 		} finally {
 			self::$adjusting = false;
 			self::forget( $id );

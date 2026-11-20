@@ -2,7 +2,7 @@
 /** Observe standard Woo stock hooks without handling stock a second time. @package YoOhwStockManager */
 defined( 'ABSPATH' ) || exit;
 
-class YSM_Tracker {
+class YOOHWSM_Tracker {
 	private $before = [];
 
 	public function __construct() {
@@ -31,7 +31,7 @@ class YSM_Tracker {
 
 	public function before( $product ) {
 		global $wpdb;
-		if ( YSM_Store::$adjusting || ysm_premium_active() || ! $product->get_id() || ! $product->managing_stock() ) {
+		if ( YOOHWSM_Store::$adjusting || yoohwsm_premium_active() || ! $product->get_id() || ! $product->managing_stock() ) {
 			return;
 		}
 		$id = $product->get_stock_managed_by_id();
@@ -45,13 +45,13 @@ class YSM_Tracker {
 		$id = $product->get_stock_managed_by_id();
 		$before = $this->before[ $id ] ?? null;
 		unset( $this->before[ $id ] );
-		if ( ! $before || YSM_Store::$adjusting || ysm_premium_active() ) {
+		if ( ! $before || YOOHWSM_Store::$adjusting || yoohwsm_premium_active() ) {
 			return;
 		}
 		$after = $wpdb->get_var( $wpdb->prepare( "SELECT meta_value FROM {$wpdb->postmeta} WHERE post_id=%d AND meta_key='_stock'", $id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Observe the actual post-write Woo balance; internal table and prepared ID; product/meta cache may be stale.
 		if ( null !== $after && abs( (float) $after - $before['quantity'] ) > 0.0000005 ) {
-			if ( ! YSM_Store::record( ysm_owner( $id ), $before['quantity'], (float) $after, $before['context'] ) ) {
-				update_option( 'ysm_history_error', current_time( 'mysql', true ), false );
+			if ( ! YOOHWSM_Store::record( yoohwsm_owner( $id ), $before['quantity'], (float) $after, $before['context'] ) ) {
+				update_option( 'yoohwsm_history_error', current_time( 'mysql', true ), false );
 			}
 		}
 	}

@@ -2,14 +2,48 @@
 /** Shared Free helpers. @package YoOhwStockManager */
 defined( 'ABSPATH' ) || exit;
 
-function ysm_premium_active() {
+function yoohwsm_premium_active() {
 	return defined( 'WCESS_VERSION' ) || class_exists( 'WC_Extended_Stock_Status' ) || function_exists( 'wcess_inventory_service' );
 }
 
-function ysm_install() {
+/** Inspect both ledger names; a failed lookup must never look like a new install. */
+function yoohwsm_storage_tables() {
 	global $wpdb;
+	$quiet = $wpdb->suppress_errors( true );
+	$tables = $wpdb->get_col( $wpdb->prepare( 'SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME IN (%s, %s)', $wpdb->prefix . 'ysm_movements', $wpdb->prefix . 'yoohwsm_movements' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Live schema check before atomic upgrade; both internal table names are prepared values.
+	$failed = '' !== $wpdb->last_error;
+	$wpdb->suppress_errors( $quiet );
+	return $failed ? null : $tables;
+}
+
+/** Rename the existing ledger in place; never rebuild lost receipts or overwrite a ledger. */
+function yoohwsm_install() {
+	global $wpdb;
+	$table = $wpdb->prefix . 'yoohwsm_movements';
+	$legacy = $wpdb->prefix . 'ysm_movements'; // Pre-prefix-update storage, only used to preserve existing installations.
+	$tables = yoohwsm_storage_tables();
+	if ( null === $tables || ( in_array( $legacy, $tables, true ) && in_array( $table, $tables, true ) ) ) {
+		return false;
+	}
+	if ( in_array( $legacy, $tables, true ) ) {
+		$quiet = $wpdb->suppress_errors( true );
+		$wpdb->query( $wpdb->prepare( 'RENAME TABLE %i TO %i', $legacy, $table ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Atomic ledger rename preserves row IDs, receipt keys and all data; internal identifiers escaped with %i.
+		$wpdb->suppress_errors( $quiet );
+		// Another bootstrap may have completed the same rename while we waited.
+		$tables = yoohwsm_storage_tables();
+		if ( null === $tables || in_array( $legacy, $tables, true ) || ! in_array( $table, $tables, true ) ) {
+			return false;
+		}
+	}
+	if ( in_array( $table, $tables, true ) ) {
+		update_option( 'yoohwsm_schema_version', '1', false );
+		return true;
+	}
+	// A marker with no ledger means recovery is needed, not an empty fresh ledger.
+	if ( false !== get_option( 'ysm_schema_version', false ) || false !== get_option( 'yoohwsm_schema_version', false ) ) {
+		return false;
+	}
 	require_once ABSPATH . 'wp-admin/includes/upgrade.php';
-	$table = $wpdb->prefix . 'ysm_movements';
 	$collate = $wpdb->get_charset_collate();
 	dbDelta( "CREATE TABLE $table (
 		id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -32,20 +66,23 @@ function ysm_install() {
 		KEY product_date (product_id,created_at_gmt),
 		KEY created_id (created_at_gmt,id)
 	) ENGINE=InnoDB $collate;" );
-	if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->esc_like( $table ) ) ) === $table ) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Verify the table created by dbDelta now exists; internal table name is escaped for LIKE and prepared; no stale schema cache.
-		update_option( 'ysm_schema_version', '1', false );
+	$tables = yoohwsm_storage_tables();
+	if ( null === $tables || in_array( $legacy, $tables, true ) || ! in_array( $table, $tables, true ) ) {
+		return false;
 	}
+	update_option( 'yoohwsm_schema_version', '1', false );
+	return true;
 }
 
 /** Strict input: do not silently truncate exponent, invalid or excessive precision. */
-function ysm_quantity( $value ) {
+function yoohwsm_quantity( $value ) {
 	if ( ( ! is_string( $value ) && ! is_int( $value ) && ! is_float( $value ) ) || ! preg_match( '/^-?\d{1,12}(?:\.\d{1,6})?$/D', (string) $value ) ) {
 		return null;
 	}
 	return (float) $value;
 }
 
-function ysm_reasons() {
+function yoohwsm_reasons() {
 	return [
 		'manual_adjustment' => __( 'Manual adjustment', 'yoohw-stock-manager' ),
 		'inventory_count' => __( 'Inventory count', 'yoohw-stock-manager' ),
@@ -54,18 +91,18 @@ function ysm_reasons() {
 	];
 }
 
-function ysm_csv_row( array $row ) {
+function yoohwsm_csv_row( array $row ) {
 	return array_map( static function ( $value ) {
 		$value = (string) $value;
 		return preg_match( '/^[\s\x00-\x20]*[=+\-@]/u', $value ) ? "'" . $value : $value;
 	}, $row );
 }
 
-function ysm_owner( $id ) {
+function yoohwsm_owner( $id ) {
 	$product = wc_get_product( absint( $id ) );
 	return $product ? wc_get_product( $product->get_stock_managed_by_id() ) : false;
 }
 
-function ysm_can_edit( $product ) {
+function yoohwsm_can_edit( $product ) {
 	return current_user_can( 'manage_woocommerce' ) && current_user_can( 'edit_post', $product->is_type( 'variation' ) ? $product->get_parent_id() : $product->get_id() );
 }

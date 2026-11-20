@@ -9,8 +9,8 @@ bash -n bin/validate-ci-gate.sh
 
 Before runtime exists PHP/unit/integration/browser/Plugin Check are NOT RUN.
 Phase B supplies `tests/unit/validation.php`, `tests/run-stock-manager-suite.sh`
-and `tests/smoke/ysm-smoke.php` for the hosted workflow. No placeholder test passes.
-Use `YSM_TEST_WP_PATH` pointing to a disposable installed WordPress/WooCommerce site.
+and `tests/smoke/yoohwsm-smoke.php` for the hosted workflow. No placeholder test passes.
+Use `YOOHWSM_TEST_WP_PATH` pointing to a disposable installed WordPress/WooCommerce site.
 Never run fixture creation/deletion on the shared Human store.
 
 Cover simple/variation/shared-parent stock, decimal quantities and backorders,
@@ -27,12 +27,12 @@ Run Plugin Check separately and record the exact candidate and limitations.
 ## Implemented commands and boundary coverage
 
 ```sh
-wp option update ysm_disposable_tests 1 --path=/disposable/wordpress
-YSM_TEST_WP_PATH=/disposable/wordpress tests/run-stock-manager-suite.sh
-wp --path=/disposable/wordpress eval-file tests/smoke/ysm-smoke.php
-python3 bin/build-package.py /tmp/ysm-review.zip
+wp option update yoohwsm_disposable_tests 1 --path=/disposable/wordpress
+YOOHWSM_TEST_WP_PATH=/disposable/wordpress tests/run-stock-manager-suite.sh
+wp --path=/disposable/wordpress eval-file tests/smoke/yoohwsm-smoke.php
+python3 bin/build-package.py /tmp/yoohwsm-review.zip
 # Extract outside source, then run Plugin Check 2.2.0 on that directory:
-wp plugin check /tmp/ysm-dist/yoohw-stock-manager --format=json > /tmp/plugin-check.txt
+wp plugin check /tmp/yoohwsm-dist/yoohw-stock-manager --format=json > /tmp/plugin-check.txt
 python3 bin/check-plugin-check.py /tmp/plugin-check.txt
 ```
 
@@ -101,3 +101,33 @@ Inventory follows the Premium selection flow: select one or more rows and submit
 through the bulk bar. There is no Actions column or separate per-product adjustment
 panel. Verify one-row and multiple-row selection through the same POST form, while
 pagination remains a separate read-only GET form.
+
+## Prefix upgrade (0.1.0 → 0.1.1 candidate)
+
+`yoohwsm_` / `YOOHWSM_` replace the short runtime prefix; the plugin name,
+`yoohw-stock-manager` slug/text domain and WooCommerce quantities stay unchanged.
+`tests/prefix-upgrade.py` uses a disposable ledger with an existing adjustment receipt:
+verify exact movement rows/IDs/payload hashes and quantities before/after the atomic
+`RENAME TABLE`, replay the same operation, inject lookup/rename failure, exercise
+conflicting and missing tables, restore fixtures, and run concurrent bootstraps.
+The regression suite runs this before the stock and real HTTP suites.
+
+Bootstrap checks both table names on every request. It never silently creates a new
+ledger when an installation marker exists, and never combines two existing ledgers.
+A conflict, missing ledger or failed schema lookup pauses Free stock runtime, including
+the observer and direct adjustment service. Recovery requires restoring the missing
+ledger or resolving the conflict from a verified backup; do not drop an existing table
+to dismiss the notice. The installer retries safely on the next request. Old schema/error
+options remain as recovery/history signals, and an old pending result notice is read
+only as fallback. New writes use the new option/transient names.
+
+The only old action/route/nonce strings shipped are narrow compatibility for 0.1.0
+forms, CSV links and bookmarks. HTTP tests verify old/new nonce separation, denied
+legacy requests, shared receipt replay and identical scoped CSV. No old public PHP
+functions/classes/constants/globals remain. CSS/JS selectors and handles move together;
+source candidate 0.1.1 keeps asset version aligned. This does not publish a release.
+
+The upgrade does not promise zero downtime for workers already executing 0.1.0 code:
+an in-flight manual adjustment must retain its normal transaction rollback if its old
+table disappears; external Woo observer failures retain their existing warning behavior.
+Database rollback or reinstalling old code is a separate Human recovery decision.

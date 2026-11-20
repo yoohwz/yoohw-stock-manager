@@ -1,5 +1,5 @@
 /* Selected Premium 2.0.1 workspace styles; reduced for Free. */
-.ysm-stock-manager-tabs {
+.yoohwsm-stock-manager-tabs {
     display: flex;
     flex-wrap: wrap;
     gap: 24px;
@@ -9,7 +9,7 @@
     overflow: visible;
     border-bottom: 1px solid #dcdcde;
 }
-.ysm-stock-manager-tab {
+.yoohwsm-stock-manager-tab {
     flex: 0 0 auto;
     box-sizing: border-box;
     margin: 0;
@@ -25,26 +25,26 @@
     line-height: 20px;
     text-decoration: none;
 }
-.ysm-stock-manager-tab:hover,
-.ysm-stock-manager-tab:focus {
+.yoohwsm-stock-manager-tab:hover,
+.yoohwsm-stock-manager-tab:focus {
     color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
     outline: none;
     box-shadow: none;
 }
-.ysm-stock-manager-tab.is-active,
-.ysm-stock-manager-tab.is-active:hover,
-.ysm-stock-manager-tab.is-active:focus {
+.yoohwsm-stock-manager-tab.is-active,
+.yoohwsm-stock-manager-tab.is-active:hover,
+.yoohwsm-stock-manager-tab.is-active:focus {
     color: #070707;
     border-bottom-color: var(--wp-admin-theme-color, #3858e9);
 }
 
-.ysm-campaign-muted {
+.yoohwsm-campaign-muted {
     color: #646970;
     font-size: 12px;
     line-height: 1.5;
     margin-top: 4px;
 }
-.ysm-status-pill {
+.yoohwsm-status-pill {
     display: inline-flex;
     align-items: center;
     min-height: 24px;
@@ -54,25 +54,25 @@
     font-weight: 600;
 }
 
-.ysm-status-pill--onbackorder {
+.yoohwsm-status-pill--onbackorder {
     background: #fef3c7;
     color: #92400e;
 }
-.ysm-status-pill--instock {
+.yoohwsm-status-pill--instock {
     background: #edfaef;
     color: #1e7e34;
 }
 
-.ysm-stock-manager {
+.yoohwsm-stock-manager {
     max-width: 1600px;
 }
-.ysm-stock-metrics {
+.yoohwsm-stock-metrics {
     display: grid;
     grid-template-columns: repeat(5, minmax(150px, 1fr));
     gap: 12px;
     margin: 18px 0 12px;
 }
-.ysm-stock-metric {
+.yoohwsm-stock-metric {
     display: block;
     min-height: 88px;
     padding: 15px 16px;
@@ -83,28 +83,28 @@
     text-decoration: none;
     box-sizing: border-box;
 }
-.ysm-stock-metric:hover,
-.ysm-stock-metric:focus {
+.yoohwsm-stock-metric:hover,
+.yoohwsm-stock-metric:focus {
     border-color: #2271b1;
     color: #1d2327;
     box-shadow: 0 0 0 1px #2271b1;
 }
-.ysm-stock-metric span {
+.yoohwsm-stock-metric span {
     display: block;
     margin-bottom: 8px;
     color: #646970;
     font-size: 12px;
 }
-.ysm-stock-metric strong {
+.yoohwsm-stock-metric strong {
     font-size: 24px;
     line-height: 1.15;
 }
-.ysm-stock-metric--primary {
+.yoohwsm-stock-metric--primary {
     border-color: #2271b1;
     background: #f0f6fc;
 }
 
-.ysm-stock-formula {
+.yoohwsm-stock-formula {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
@@ -115,10 +115,10 @@
     background: #fff;
     color: #50575e;
 }
-.ysm-stock-formula strong {
+.yoohwsm-stock-formula strong {
     color: #1d2327;
 }
-.ysm-stock-filters {
+.yoohwsm-stock-filters {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
@@ -129,10 +129,10 @@
     border-radius: 8px;
     background: #fff;
 }
-.ysm-stock-filters input[type="search"] {
+.yoohwsm-stock-filters input[type="search"] {
     min-width: 240px;
 }
-.ysm-stock-bulk {
+.yoohwsm-stock-bulk {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr)) auto;
     align-items: end;
@@ -143,50 +143,50 @@
     border-radius: 8px;
     background: #fff;
 }
-.ysm-stock-bulk label {
+.yoohwsm-stock-bulk label {
     display: block;
     margin-bottom: 5px;
     font-size: 12px;
     font-weight: 600;
 }
-.ysm-stock-bulk input,
-.ysm-stock-bulk select {
+.yoohwsm-stock-bulk input,
+.yoohwsm-stock-bulk select {
     width: 100%;
     max-width: none;
 }
-.ysm-stock-bulk .button {
+.yoohwsm-stock-bulk .button {
     min-height: 32px;
 }
 
-.ysm-status-pill--outofstock {
+.yoohwsm-status-pill--outofstock {
     background: #fcf0f1;
     color: #b32d2e;
 }
-.ysm-stock-metrics { grid-template-columns: repeat(3,minmax(140px,1fr)); }
-.ysm-stock-bulk-field { min-width: 0; }
-.ysm-stock-bulk-actions .button { width: 100%; }
-.ysm-stock-bulk-help { margin: 8px 0 14px; }
-.ysm-stock-table-wrap { overflow-x: auto; }
-.ysm-stock-manager-table { min-width: 720px; }
-.ysm-stock-manager-table td { vertical-align: top; }
-.ysm-inventory-delta { color: #1e7e34; }
-.ysm-inventory-delta.is-negative, .ysm-stock-alert-text { color: #b32d2e; }
-.ysm-help { padding: 16px 20px; background: white; border: 1px solid #dcdcde; border-radius: 8px; margin-bottom: 16px; }
-.ysm-empty-state { padding: 24px; text-align: center; }
-.ysm-export { text-align: right; }
-.ysm-stock-manager-tab:focus-visible { outline: 2px solid #2271b1; outline-offset: 3px; }
+.yoohwsm-stock-metrics { grid-template-columns: repeat(3,minmax(140px,1fr)); }
+.yoohwsm-stock-bulk-field { min-width: 0; }
+.yoohwsm-stock-bulk-actions .button { width: 100%; }
+.yoohwsm-stock-bulk-help { margin: 8px 0 14px; }
+.yoohwsm-stock-table-wrap { overflow-x: auto; }
+.yoohwsm-stock-manager-table { min-width: 720px; }
+.yoohwsm-stock-manager-table td { vertical-align: top; }
+.yoohwsm-inventory-delta { color: #1e7e34; }
+.yoohwsm-inventory-delta.is-negative, .yoohwsm-stock-alert-text { color: #b32d2e; }
+.yoohwsm-help { padding: 16px 20px; background: white; border: 1px solid #dcdcde; border-radius: 8px; margin-bottom: 16px; }
+.yoohwsm-empty-state { padding: 24px; text-align: center; }
+.yoohwsm-export { text-align: right; }
+.yoohwsm-stock-manager-tab:focus-visible { outline: 2px solid #2271b1; outline-offset: 3px; }
 @media (max-width: 782px) {
- .ysm-stock-manager-tabs { gap: 16px; padding: 0 8px; }
- .ysm-stock-metrics { grid-template-columns: 1fr; }
- .ysm-stock-bulk { grid-template-columns: 1fr; }
- .ysm-stock-filters { align-items: stretch; flex-direction: column; }
- .ysm-stock-filters input,.ysm-stock-filters select,.ysm-stock-bulk input,.ysm-stock-bulk select { width: 100%; min-width: 0; }
+ .yoohwsm-stock-manager-tabs { gap: 16px; padding: 0 8px; }
+ .yoohwsm-stock-metrics { grid-template-columns: 1fr; }
+ .yoohwsm-stock-bulk { grid-template-columns: 1fr; }
+ .yoohwsm-stock-filters { align-items: stretch; flex-direction: column; }
+ .yoohwsm-stock-filters input,.yoohwsm-stock-filters select,.yoohwsm-stock-bulk input,.yoohwsm-stock-bulk select { width: 100%; min-width: 0; }
 }
 
 /* Keep the reduced tables legible in a keyboard-scrollable viewport. */
-.ysm-history-table { min-width: 940px; }
+.yoohwsm-history-table { min-width: 940px; }
 @media (max-width: 782px) {
- .ysm-stock-manager-table thead th, .ysm-stock-manager-table tfoot th, .ysm-stock-manager-table tbody td { display: table-cell !important; padding: 8px 10px !important; }
- .ysm-stock-manager-table tbody td::before, .ysm-stock-manager-table .toggle-row { display: none !important; }
- .ysm-stock-manager-table tr { display: table-row !important; }
+ .yoohwsm-stock-manager-table thead th, .yoohwsm-stock-manager-table tfoot th, .yoohwsm-stock-manager-table tbody td { display: table-cell !important; padding: 8px 10px !important; }
+ .yoohwsm-stock-manager-table tbody td::before, .yoohwsm-stock-manager-table .toggle-row { display: none !important; }
+ .yoohwsm-stock-manager-table tr { display: table-row !important; }
 }

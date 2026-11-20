@@ -1,11 +1,11 @@
 <?php
 /** Disposable HTTP-boundary fixtures, never loaded by the plugin. */
 defined( 'ABSPATH' ) || exit;
-if ( ! get_option( 'ysm_disposable_tests' ) ) {
+if ( ! get_option( 'yoohwsm_disposable_tests' ) ) {
 	throw new RuntimeException( 'Disposable test opt-in required.' );
 }
 global $wpdb;
-$mode = getenv( 'YSM_HTTP_MODE' );
+$mode = getenv( 'YOOHWSM_HTTP_MODE' );
 if ( 'setup' === $mode ) {
 	$ids = [];
 	foreach ( [ true, false ] as $managed ) {
@@ -33,8 +33,8 @@ if ( 'setup' === $mode ) {
 	}
 	$users = [];
 	foreach ( [ 'administrator', 'subscriber', 'cap_only' ] as $role ) {
-		$login = 'ysm_' . $role . '_' . substr( str_replace( '-', '', wp_generate_uuid4() ), 0, 10 );
-		$id = wp_create_user( $login, getenv( 'YSM_HTTP_PASSWORD' ) );
+		$login = 'yoohwsm_' . $role . '_' . substr( str_replace( '-', '', wp_generate_uuid4() ), 0, 10 );
+		$id = wp_create_user( $login, getenv( 'YOOHWSM_HTTP_PASSWORD' ) );
 		if ( is_wp_error( $id ) ) {
 			throw new RuntimeException( 'HTTP fixture user failed.' );
 		}
@@ -46,29 +46,34 @@ if ( 'setup' === $mode ) {
 		$users[] = [ 'id' => $id, 'login' => $login ];
 	}
 	$data = [ 'products' => $ids, 'users' => $users, 'shared_parent' => $parent->get_id(), 'shared_variations' => $shared ];
-	update_option( 'ysm_http_fixture', $data, false );
+	update_option( 'yoohwsm_http_fixture', $data, false );
 	echo wp_json_encode( $data );
+} elseif ( 'legacy_nonces' === $mode ) {
+	$data = get_option( 'yoohwsm_http_fixture' );
+	wp_set_current_user( $data['users'][0]['id'] );
+	$_COOKIE[ LOGGED_IN_COOKIE ] = rawurldecode( getenv( 'YOOHWSM_HTTP_COOKIE' ) );
+	echo wp_json_encode( [ 'adjust' => wp_create_nonce( 'ysm_adjust' ), 'export' => wp_create_nonce( 'ysm_export' ) ] );
 } elseif ( 'verify' === $mode ) {
-	$data = get_option( 'ysm_http_fixture' );
+	$data = get_option( 'yoohwsm_http_fixture' );
 	$id = $data['products'][0];
-	YSM_Store::forget( $id );
-	if ( 11.0 !== (float) wc_get_product( $id )->get_stock_quantity() || 1 !== YSM_Store::history( [ 'product_id' => $id, 'source' => 'free' ], 25, 0, 0, true ) ) {
+	YOOHWSM_Store::forget( $id );
+	if ( 11.0 !== (float) wc_get_product( $id )->get_stock_quantity() || 1 !== YOOHWSM_Store::history( [ 'product_id' => $id, 'source' => 'free' ], 25, 0, 0, true ) ) {
 		throw new RuntimeException( 'HTTP replay/denied request changed stock or duplicated history.' );
 	}
 	$parent_id = $data['shared_parent'];
-	YSM_Store::forget( $parent_id );
-	if ( 6.0 !== (float) wc_get_product( $parent_id )->get_stock_quantity() || 1 !== YSM_Store::history( [ 'product_id' => $parent_id, 'source' => 'free' ], 25, 0, 0, true ) ) {
+	YOOHWSM_Store::forget( $parent_id );
+	if ( 6.0 !== (float) wc_get_product( $parent_id )->get_stock_quantity() || 1 !== YOOHWSM_Store::history( [ 'product_id' => $parent_id, 'source' => 'free' ], 25, 0, 0, true ) ) {
 		throw new RuntimeException( 'Bulk shared owner changed more than once.' );
 	}
 } elseif ( 'cleanup' === $mode ) {
-	$data = get_option( 'ysm_http_fixture' );
+	$data = get_option( 'yoohwsm_http_fixture' );
 	foreach ( array_merge( $data['shared_variations'], [ $data['shared_parent'] ], $data['products'] ) as $id ) {
 		wp_delete_post( $id, true );
-		$wpdb->delete( YSM_Store::table(), [ 'product_id' => $id ] );
+		$wpdb->delete( YOOHWSM_Store::table(), [ 'product_id' => $id ] );
 	}
 	require_once ABSPATH . 'wp-admin/includes/user.php';
 	foreach ( $data['users'] as $user ) {
 		wp_delete_user( $user['id'] );
 	}
-	delete_option( 'ysm_http_fixture' );
+	delete_option( 'yoohwsm_http_fixture' );
 }

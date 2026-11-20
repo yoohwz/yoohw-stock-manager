@@ -6,11 +6,11 @@ import subprocess
 import uuid
 
 root = Path(__file__).resolve().parents[1]
-command = [os.environ.get('YSM_TEST_WP_CLI', 'wp'), '--path=' + os.environ['YSM_TEST_WP_PATH'],
+command = [os.environ.get('YOOHWSM_TEST_WP_CLI', 'wp'), '--path=' + os.environ['YOOHWSM_TEST_WP_PATH'],
            'eval-file', str(root / 'tests/integration/concurrency.php')]
 
 def run(mode, product_id='', operation=''):
-    env = dict(os.environ, YSM_RACE_MODE=mode, YSM_RACE_ID=str(product_id), YSM_RACE_UUID=operation)
+    env = dict(os.environ, YOOHWSM_RACE_MODE=mode, YOOHWSM_RACE_ID=str(product_id), YOOHWSM_RACE_UUID=operation)
     result = subprocess.run(command, env=env, capture_output=True, text=True, check=True)
     return result.stdout.strip()
 
