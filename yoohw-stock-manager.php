@@ -2,7 +2,7 @@
 /**
  * Plugin Name: YoOhw Stock Manager for WooCommerce
  * Description: Manage WooCommerce stock, adjustments, movement history and basic CSV exports.
- * Version: 0.1.0
+ * Version: 0.1.1
  * Requires at least: 6.3
  * Requires PHP: 7.4
  * Requires Plugins: woocommerce
@@ -18,13 +18,13 @@
  * @package YoOhwStockManager
  */
 defined( 'ABSPATH' ) || exit;
-define( 'YSM_VERSION', '0.1.0' );
-define( 'YSM_FILE', __FILE__ );
+define( 'YOOHWSM_VERSION', '0.1.1' );
+define( 'YOOHWSM_FILE', __FILE__ );
 require_once __DIR__ . '/inc/functions.php';
-register_activation_hook( __FILE__, 'ysm_install' );
+register_activation_hook( __FILE__, 'yoohwsm_install' );
 add_action( 'before_woocommerce_init', static function () {
 	if ( class_exists( '\Automattic\WooCommerce\Utilities\FeaturesUtil' ) ) {
-		\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', YSM_FILE, true );
+		\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', YOOHWSM_FILE, true );
 	}
 } );
 add_action( 'plugins_loaded', static function () {
@@ -36,16 +36,22 @@ add_action( 'plugins_loaded', static function () {
 		} );
 		return;
 	}
-	if ( get_option( 'ysm_schema_version' ) !== '1' ) {
-		ysm_install();
+	define( 'YOOHWSM_STORAGE_READY', yoohwsm_install() );
+	if ( ! YOOHWSM_STORAGE_READY ) {
+		add_action( 'admin_notices', static function () {
+			if ( current_user_can( 'manage_woocommerce' ) ) {
+				echo '<div class="notice notice-error"><p>' . esc_html__( 'Stock Manager could not safely open or upgrade its history table. Free adjustments and tracking are paused. Existing data has not been replaced. Check database permissions and restore any missing history table before retrying.', 'yoohw-stock-manager' ) . '</p></div>';
+			}
+		} );
+		return;
 	}
-	require_once __DIR__ . '/inc/class-ysm-store.php';
-	require_once __DIR__ . '/inc/class-ysm-tracker.php';
-	if ( ! ysm_premium_active() ) {
-		$GLOBALS['ysm_tracker'] = new YSM_Tracker();
+	require_once __DIR__ . '/inc/class-yoohwsm-store.php';
+	require_once __DIR__ . '/inc/class-yoohwsm-tracker.php';
+	if ( ! yoohwsm_premium_active() ) {
+		$GLOBALS['yoohwsm_tracker'] = new YOOHWSM_Tracker();
 	}
 	if ( is_admin() ) {
-		require_once __DIR__ . '/inc/class-ysm-admin.php';
-		new YSM_Admin();
+		require_once __DIR__ . '/inc/class-yoohwsm-admin.php';
+		new YOOHWSM_Admin();
 	}
 }, 30 );

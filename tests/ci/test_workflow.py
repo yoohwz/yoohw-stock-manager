@@ -126,7 +126,7 @@ class RepositoryTests(unittest.TestCase):
             self.assertIn('timeout-minutes:', block)
         self.assertIn("matrix: ${{ fromJSON(needs.classify.outputs.matrix) }}", blocks['integration'])
         self.assertIn('tests/run-stock-manager-suite.sh', blocks['integration'])
-        self.assertIn('tests/smoke/ysm-smoke.php', blocks['integration'])
+        self.assertIn('tests/smoke/yoohwsm-smoke.php', blocks['integration'])
         self.assertIn('OrderUtil::custom_orders_table_usage_is_enabled()', blocks['integration'])
         self.assertIn('git diff --no-renames --name-only', blocks['classify'])
         self.assertIn('if: ${{ always() }}', blocks['ci-gate'])

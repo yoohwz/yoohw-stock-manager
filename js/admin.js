@@ -3,7 +3,7 @@
     'use strict';
     document.addEventListener('submit', function (event) {
         var form = event.target;
-        if (!form.querySelector('input[name="action"][value="ysm_adjust"]')) {
+        if (!form.querySelector('input[name="action"][value="yoohwsm_adjust"]')) {
             return;
         }
         var button = event.submitter;

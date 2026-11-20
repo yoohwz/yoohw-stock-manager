@@ -5,7 +5,7 @@ Requires at least: 6.3
 Tested up to: 7.1
 Requires PHP: 7.4
 Requires Plugins: woocommerce
-Stable tag: 0.1.0
+Stable tag: 0.1.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -51,11 +51,19 @@ Free adjustment and tracking pause while Premium is active. Use Premium for stoc
 
 No. Deactivation and uninstall retain the Free movement table and settings. This preserves records for later reactivation or a switch to Premium. Back up and manage retained data according to your store policy.
 
+= Does the prefix update keep my existing stock history? =
+
+Yes. The 0.1.1 update preserves existing history and adjustment receipts in place. It does not change WooCommerce stock quantities. If the history storage cannot be upgraded safely, Free adjustments and tracking pause with an admin notice until the database issue is resolved; an empty history is not substituted.
+
 = Can I import a CSV? =
 
 Use WooCommerce's product importer. This plugin only provides basic exports.
 
 == Changelog ==
+
+= 0.1.1 =
+* Use the distinct yoohwsm prefix and correct the contributor username.
+* Preserve existing history and replay receipts when upgrading from 0.1.0.
 
 = 0.1.0 =
 * Initial development candidate with inventory, adjustments, history and scoped CSV.
