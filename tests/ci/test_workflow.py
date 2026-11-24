@@ -20,7 +20,7 @@ class RoutingTests(unittest.TestCase):
         return ci.classify(event, draft, paths, JOBS)
 
     def test_iteration_and_final_runtime_coverage(self):
-        for path in ['inc/cores/inventory.php', 'yoohw-stock-manager.php',
+        for path in ['inc/cores/inventory.php', 'yoohw-stock-desk.php',
                      'tests/run-stock-manager-suite.sh', 'readme.txt', 'unknown/path']:
             for draft in [False, True]:
                 with self.subTest(path=path, draft=draft):

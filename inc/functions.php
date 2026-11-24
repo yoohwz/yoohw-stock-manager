@@ -1,5 +1,5 @@
 <?php
-/** Shared Free helpers. @package YoOhwStockManager */
+/** Shared Free helpers. @package YoOhwStockDesk */
 defined( 'ABSPATH' ) || exit;
 
 function yoohwsm_premium_active() {
@@ -84,10 +84,10 @@ function yoohwsm_quantity( $value ) {
 
 function yoohwsm_reasons() {
 	return [
-		'manual_adjustment' => __( 'Manual adjustment', 'yoohw-stock-manager' ),
-		'inventory_count' => __( 'Inventory count', 'yoohw-stock-manager' ),
-		'correction' => __( 'Correction', 'yoohw-stock-manager' ),
-		'goods_received' => __( 'Goods received', 'yoohw-stock-manager' ),
+		'manual_adjustment' => __( 'Manual adjustment', 'yoohw-stock-desk' ),
+		'inventory_count' => __( 'Inventory count', 'yoohw-stock-desk' ),
+		'correction' => __( 'Correction', 'yoohw-stock-desk' ),
+		'goods_received' => __( 'Goods received', 'yoohw-stock-desk' ),
 	];
 }
 

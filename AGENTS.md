@@ -1,4 +1,4 @@
-# YoOhw Stock Manager for WooCommerce
+# YoOhw Stock Desk for WooCommerce
 
 Read `docs/workflow.md` and `docs/stock-manager-testing.md` before changes.
 Human-facing communication is Vietnamese; source and documentation use English.

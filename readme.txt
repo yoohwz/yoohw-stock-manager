@@ -1,11 +1,11 @@
-=== YoOhw Stock Manager for WooCommerce ===
+=== YoOhw Stock Desk for WooCommerce ===
 Contributors: yoohw
-Tags: woocommerce, inventory, stock, stock manager
+Tags: woocommerce, inventory, stock, stock adjustments
 Requires at least: 6.3
 Tested up to: 7.1
 Requires PHP: 7.4
 Requires Plugins: woocommerce
-Stable tag: 0.1.1
+Stable tag: 0.1.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -13,7 +13,7 @@ Manage WooCommerce stock, single and bulk adjustments, movement history, low sto
 
 == Description ==
 
-YoOhw Stock Manager for WooCommerce is a free, standalone inventory workspace.
+YoOhw Stock Desk for WooCommerce is a free, standalone inventory workspace.
 
 * Inventory: product, SKU, variation, WooCommerce quantity, status and low stock threshold.
 * Search by name, SKU or ID; filter by category and stock status; sort and paginate.
@@ -34,10 +34,14 @@ Free requires no account, license key or paid service. It sends no telemetry. On
 == Installation ==
 
 1. Install and activate WooCommerce 8.0 or newer.
-2. Install this plugin in wp-content/plugins/yoohw-stock-manager and activate it.
-3. Open Stock Manager > Inventory. Enable WooCommerce stock management on products you want to manage.
+2. Install this plugin in wp-content/plugins/yoohw-stock-desk and activate it.
+3. Open Stock Desk > Inventory. Enable WooCommerce stock management on products you want to manage.
 
 == Frequently Asked Questions ==
+
+= How do I switch from a previous review build? =
+
+Deactivate the previous Stock Manager review build before installing and activating Stock Desk. The new plugin folder gives it a separate entry on the Plugins screen. Activate only one Free build at a time. Stock Desk uses the same movement history and adjustment receipts, and activation does not change WooCommerce stock quantities.
 
 = Can I manage decimal quantities and backorders? =
 
@@ -60,6 +64,9 @@ Yes. The 0.1.1 update preserves existing history and adjustment receipts in plac
 Use WooCommerce's product importer. This plugin only provides basic exports.
 
 == Changelog ==
+
+= 0.1.2 =
+* Rename the plugin to YoOhw Stock Desk for WooCommerce and update its directory slug and text domain.
 
 = 0.1.1 =
 * Use the distinct yoohwsm prefix and correct the contributor username.

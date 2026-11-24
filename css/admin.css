@@ -1,5 +1,5 @@
 /* Selected Premium 2.0.1 workspace styles; reduced for Free. */
-.yoohwsm-stock-manager-tabs {
+.yoohwsm-stock-desk-tabs {
     display: flex;
     flex-wrap: wrap;
     gap: 24px;
@@ -9,7 +9,7 @@
     overflow: visible;
     border-bottom: 1px solid #dcdcde;
 }
-.yoohwsm-stock-manager-tab {
+.yoohwsm-stock-desk-tab {
     flex: 0 0 auto;
     box-sizing: border-box;
     margin: 0;
@@ -25,15 +25,15 @@
     line-height: 20px;
     text-decoration: none;
 }
-.yoohwsm-stock-manager-tab:hover,
-.yoohwsm-stock-manager-tab:focus {
+.yoohwsm-stock-desk-tab:hover,
+.yoohwsm-stock-desk-tab:focus {
     color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
     outline: none;
     box-shadow: none;
 }
-.yoohwsm-stock-manager-tab.is-active,
-.yoohwsm-stock-manager-tab.is-active:hover,
-.yoohwsm-stock-manager-tab.is-active:focus {
+.yoohwsm-stock-desk-tab.is-active,
+.yoohwsm-stock-desk-tab.is-active:hover,
+.yoohwsm-stock-desk-tab.is-active:focus {
     color: #070707;
     border-bottom-color: var(--wp-admin-theme-color, #3858e9);
 }
@@ -63,7 +63,7 @@
     color: #1e7e34;
 }
 
-.yoohwsm-stock-manager {
+.yoohwsm-stock-desk {
     max-width: 1600px;
 }
 .yoohwsm-stock-metrics {
@@ -167,16 +167,16 @@
 .yoohwsm-stock-bulk-actions .button { width: 100%; }
 .yoohwsm-stock-bulk-help { margin: 8px 0 14px; }
 .yoohwsm-stock-table-wrap { overflow-x: auto; }
-.yoohwsm-stock-manager-table { min-width: 720px; }
-.yoohwsm-stock-manager-table td { vertical-align: top; }
+.yoohwsm-stock-desk-table { min-width: 720px; }
+.yoohwsm-stock-desk-table td { vertical-align: top; }
 .yoohwsm-inventory-delta { color: #1e7e34; }
 .yoohwsm-inventory-delta.is-negative, .yoohwsm-stock-alert-text { color: #b32d2e; }
 .yoohwsm-help { padding: 16px 20px; background: white; border: 1px solid #dcdcde; border-radius: 8px; margin-bottom: 16px; }
 .yoohwsm-empty-state { padding: 24px; text-align: center; }
 .yoohwsm-export { text-align: right; }
-.yoohwsm-stock-manager-tab:focus-visible { outline: 2px solid #2271b1; outline-offset: 3px; }
+.yoohwsm-stock-desk-tab:focus-visible { outline: 2px solid #2271b1; outline-offset: 3px; }
 @media (max-width: 782px) {
- .yoohwsm-stock-manager-tabs { gap: 16px; padding: 0 8px; }
+ .yoohwsm-stock-desk-tabs { gap: 16px; padding: 0 8px; }
  .yoohwsm-stock-metrics { grid-template-columns: 1fr; }
  .yoohwsm-stock-bulk { grid-template-columns: 1fr; }
  .yoohwsm-stock-filters { align-items: stretch; flex-direction: column; }
@@ -186,7 +186,7 @@
 /* Keep the reduced tables legible in a keyboard-scrollable viewport. */
 .yoohwsm-history-table { min-width: 940px; }
 @media (max-width: 782px) {
- .yoohwsm-stock-manager-table thead th, .yoohwsm-stock-manager-table tfoot th, .yoohwsm-stock-manager-table tbody td { display: table-cell !important; padding: 8px 10px !important; }
- .yoohwsm-stock-manager-table tbody td::before, .yoohwsm-stock-manager-table .toggle-row { display: none !important; }
- .yoohwsm-stock-manager-table tr { display: table-row !important; }
+ .yoohwsm-stock-desk-table thead th, .yoohwsm-stock-desk-table tfoot th, .yoohwsm-stock-desk-table tbody td { display: table-cell !important; padding: 8px 10px !important; }
+ .yoohwsm-stock-desk-table tbody td::before, .yoohwsm-stock-desk-table .toggle-row { display: none !important; }
+ .yoohwsm-stock-desk-table tr { display: table-row !important; }
 }

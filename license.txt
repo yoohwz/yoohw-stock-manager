@@ -1,4 +1,4 @@
-YoOhw Stock Manager for WooCommerce
+YoOhw Stock Desk for WooCommerce
 Copyright (C) 2026 Yo Ohw Studio
 Licensed under GPL-2.0-or-later.
 

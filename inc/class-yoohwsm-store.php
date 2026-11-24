@@ -1,5 +1,5 @@
 <?php
-/** WooCommerce-backed inventory and retained movement storage. @package YoOhwStockManager */
+/** WooCommerce-backed inventory and retained movement storage. @package YoOhwStockDesk */
 defined( 'ABSPATH' ) || exit;
 
 class YOOHWSM_Store {
@@ -38,11 +38,11 @@ class YOOHWSM_Store {
 		global $wpdb;
 		$product = yoohwsm_owner( $id );
 		if ( ! defined( 'YOOHWSM_STORAGE_READY' ) || ! YOOHWSM_STORAGE_READY || yoohwsm_premium_active() || ! $product || ! yoohwsm_can_edit( $product ) || ! $product->managing_stock() ) {
-			return new WP_Error( 'yoohwsm_denied', __( 'Stock adjustment is unavailable for this product.', 'yoohw-stock-manager' ) );
+			return new WP_Error( 'yoohwsm_denied', __( 'Stock adjustment is unavailable for this product.', 'yoohw-stock-desk' ) );
 		}
 		$quantity = yoohwsm_quantity( $raw_quantity );
 		if ( null === $quantity || ! in_array( $operation, [ 'set', 'increase', 'decrease' ], true ) || ( 'set' !== $operation && $quantity <= 0 ) || ! isset( yoohwsm_reasons()[ $reason ] ) || ! preg_match( '/^[a-f0-9-]{36}$/D', $uuid ) ) {
-			return new WP_Error( 'yoohwsm_invalid', __( 'Check the operation, quantity and reason.', 'yoohw-stock-manager' ) );
+			return new WP_Error( 'yoohwsm_invalid', __( 'Check the operation, quantity and reason.', 'yoohw-stock-desk' ) );
 		}
 		$id = $product->get_id();
 		$key = hash( 'sha256', $uuid . ':' . $id );
@@ -50,7 +50,7 @@ class YOOHWSM_Store {
 		$hash = hash( 'sha256', wp_json_encode( [ get_current_user_id(), $operation, $quantity, $reason, $note ] ) );
 		// Reject nested transactions; do not commit a caller's pending work.
 		if ( ! $wpdb->dbh instanceof mysqli ) {
-			return new WP_Error( 'yoohwsm_transaction', __( 'Stock adjustment requires a supported database connection.', 'yoohw-stock-manager' ) );
+			return new WP_Error( 'yoohwsm_transaction', __( 'Stock adjustment requires a supported database connection.', 'yoohw-stock-desk' ) );
 		}
 		// SAVEPOINT is a no-op outside a transaction; only an existing transaction
 		// can roll back to it. This works on MySQL and MariaDB without committing
@@ -65,16 +65,16 @@ class YOOHWSM_Store {
 		}
 		$wpdb->suppress_errors( $quiet );
 		if ( false === $savepoint || false !== $active || ! $missing ) {
-			return new WP_Error( 'yoohwsm_transaction', __( 'Stock adjustment requires an independent transaction.', 'yoohw-stock-manager' ) );
+			return new WP_Error( 'yoohwsm_transaction', __( 'Stock adjustment requires an independent transaction.', 'yoohw-stock-desk' ) );
 		}
 		foreach ( [ $wpdb->posts, $wpdb->postmeta, $wpdb->prefix . 'wc_product_meta_lookup', self::table() ] as $table ) {
 			$engine = $wpdb->get_var( $wpdb->prepare( 'SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = %s', $table ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Live engine check guards transaction safety; table name is a prepared value.
 			if ( 'InnoDB' !== $engine ) {
-				return new WP_Error( 'yoohwsm_engine', __( 'Stock adjustment requires InnoDB storage.', 'yoohw-stock-manager' ) );
+				return new WP_Error( 'yoohwsm_engine', __( 'Stock adjustment requires InnoDB storage.', 'yoohw-stock-desk' ) );
 			}
 		}
 		if ( false === $wpdb->query( 'START TRANSACTION' ) ) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Transaction command must execute directly and must never be cached.
-			return new WP_Error( 'yoohwsm_transaction', __( 'The stock transaction could not start.', 'yoohw-stock-manager' ) );
+			return new WP_Error( 'yoohwsm_transaction', __( 'The stock transaction could not start.', 'yoohw-stock-desk' ) );
 		}
 		self::$adjusting = true;
 		try {
@@ -123,7 +123,7 @@ class YOOHWSM_Store {
 			return $expected === $before ? 'skipped' : 'success';
 		} catch ( Throwable $error ) {
 			$wpdb->query( 'ROLLBACK' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Roll back the live transaction; no request data or cache.
-			return new WP_Error( 'yoohwsm_adjust_failed', __( 'The stock adjustment could not be completed. Refresh stock and retry.', 'yoohw-stock-manager' ) );
+			return new WP_Error( 'yoohwsm_adjust_failed', __( 'The stock adjustment could not be completed. Refresh stock and retry.', 'yoohw-stock-desk' ) );
 		} finally {
 			self::$adjusting = false;
 			self::forget( $id );

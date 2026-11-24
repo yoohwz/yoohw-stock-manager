@@ -13,5 +13,5 @@ with zipfile.ZipFile(output, 'w', zipfile.ZIP_DEFLATED) as archive:
         if any(fnmatch.fnmatch(str(relative), pattern) or any(fnmatch.fnmatch(part, pattern) for part in relative.parts) for pattern in patterns):
             continue
         if path.is_file() and path.resolve() != output:
-            archive.write(path, 'yoohw-stock-manager/' + relative.as_posix())
+            archive.write(path, 'yoohw-stock-desk/' + relative.as_posix())
 print(output)

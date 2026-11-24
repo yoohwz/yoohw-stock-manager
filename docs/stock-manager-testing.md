@@ -1,4 +1,4 @@
-# Free Stock Manager verification
+# Free Stock Desk verification
 
 Workflow-only checks (no WordPress required):
 
@@ -32,7 +32,7 @@ YOOHWSM_TEST_WP_PATH=/disposable/wordpress tests/run-stock-manager-suite.sh
 wp --path=/disposable/wordpress eval-file tests/smoke/yoohwsm-smoke.php
 python3 bin/build-package.py /tmp/yoohwsm-review.zip
 # Extract outside source, then run Plugin Check 2.2.0 on that directory:
-wp plugin check /tmp/yoohwsm-dist/yoohw-stock-manager --format=json > /tmp/plugin-check.txt
+wp plugin check /tmp/yoohwsm-dist/yoohw-stock-desk --format=json > /tmp/plugin-check.txt
 python3 bin/check-plugin-check.py /tmp/plugin-check.txt
 ```
 
@@ -105,7 +105,8 @@ pagination remains a separate read-only GET form.
 ## Prefix upgrade (0.1.0 → 0.1.1 candidate)
 
 `yoohwsm_` / `YOOHWSM_` replace the short runtime prefix; the plugin name,
-`yoohw-stock-manager` slug/text domain and WooCommerce quantities stay unchanged.
+`yoohw-stock-manager` slug/text domain and WooCommerce quantities were unchanged in 0.1.1.
+The 0.1.2 review candidate changes the public identity to Stock Desk and retains the same storage.
 `tests/prefix-upgrade.py` uses a disposable ledger with an existing adjustment receipt:
 verify exact movement rows/IDs/payload hashes and quantities before/after the atomic
 `RENAME TABLE`, replay the same operation, inject lookup/rename failure, exercise
