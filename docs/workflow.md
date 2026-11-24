@@ -1,4 +1,4 @@
-# Free Stock Manager engineering workflow
+# Free Stock Desk engineering workflow
 
 Adapted from Premium `d21f40a595d4203aa789355c4d43bd4f5dd226fd`.
 

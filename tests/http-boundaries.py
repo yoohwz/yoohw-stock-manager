@@ -82,8 +82,11 @@ try:
         admin = session(data['users'][0]['login'], base)
         subscriber = session(data['users'][1]['login'], base)
         cap_only = session(data['users'][2]['login'], base)
-        status, body = request(admin, base + '/wp-admin/admin.php?page=yoohw-stock-manager')
-        assert status == 200
+        status, body = request(admin, base + '/wp-admin/admin.php?page=yoohw-stock-desk')
+        assert status == 200 and 'Stock Desk' in body
+        legacy_status, legacy_body = request(admin, base + '/wp-admin/admin.php?page=yoohw-stock-manager')
+        assert legacy_status == 200 and 'yoohwsm-bulk-adjustment' in legacy_body, 'Previous Inventory bookmark broken'
+        assert request(subscriber, base + '/wp-admin/admin.php?page=yoohw-stock-manager')[0] == 403, 'Subscriber used previous Inventory bookmark'
         parsed = Inputs(body)
         fields = parsed.values
         bulk_form = next(form for form in parsed.forms if form['identity'] == 'yoohwsm-bulk-adjustment')
@@ -122,7 +125,7 @@ try:
         assert request(admin, base + '/wp-admin/admin-post.php', denied)[0] == 403, 'Missing nonce accepted'
         assert request(subscriber, base + '/wp-admin/admin-post.php', payload)[0] == 403, 'Subscriber write accepted'
         assert request(subscriber, base + '/wp-admin/admin.php?page=yoohwsm-history')[0] == 403, 'Subscriber history accepted'
-        cap_status, cap_body = request(cap_only, base + '/wp-admin/admin.php?page=yoohw-stock-manager')
+        cap_status, cap_body = request(cap_only, base + '/wp-admin/admin.php?page=yoohw-stock-desk')
         assert cap_status == 200, 'manage_woocommerce read access rejected'
         cap_fields = Inputs(cap_body).values
         cap_payload = dict(payload, yoohwsm_nonce=cap_fields['yoohwsm_nonce'], operation_uuid=str(uuid.uuid4()))

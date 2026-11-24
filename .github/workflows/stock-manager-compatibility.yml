@@ -1,4 +1,4 @@
-name: Stock Manager CI
+name: Stock Desk CI
 
 on:
   push:
@@ -132,7 +132,7 @@ jobs:
           --health-retries=10
 
     steps:
-      - name: Check out Stock Manager
+      - name: Check out Stock Desk
         uses: actions/checkout@v5
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
@@ -155,10 +155,10 @@ jobs:
           WP_PATH="$RUNNER_TEMP/wordpress"
           wp core download --path="$WP_PATH" --version="$WP_VERSION" --force
           wp config create --path="$WP_PATH" --dbname=wordpress --dbuser=root --dbpass=root --dbhost=127.0.0.1:3306 --skip-check
-          wp core install --path="$WP_PATH" --url=https://stock-manager.test --title="Stock Manager CI" --admin_user=admin --admin_password=password --admin_email=admin@example.test --skip-email
+          wp core install --path="$WP_PATH" --url=https://stock-manager.test --title="Stock Desk CI" --admin_user=admin --admin_password=password --admin_email=admin@example.test --skip-email
           wp plugin install woocommerce --path="$WP_PATH" --version="$WC_VERSION" --activate
-          ln -s "$GITHUB_WORKSPACE" "$WP_PATH/wp-content/plugins/yoohw-stock-manager"
-          wp plugin activate yoohw-stock-manager --path="$WP_PATH"
+          ln -s "$GITHUB_WORKSPACE" "$WP_PATH/wp-content/plugins/yoohw-stock-desk"
+          wp plugin activate yoohw-stock-desk --path="$WP_PATH"
           wp option update yoohwsm_disposable_tests 1 --path="$WP_PATH"
           if [ "$ORDER_STORAGE" = "hpos" ]; then
             wp option update woocommerce_custom_orders_table_enabled yes --path="$WP_PATH"
@@ -179,7 +179,7 @@ jobs:
           if ( $enabled !== ( "hpos" === getenv( "ORDER_STORAGE" ) ) ) { WP_CLI::error( "Unexpected order storage mode." ); }
           '
 
-      - name: Run Stock Manager regression suite
+      - name: Run Stock Desk regression suite
         env:
           YOOHWSM_TEST_PHP_BIN: php
           YOOHWSM_TEST_WP_CLI: wp
@@ -196,7 +196,7 @@ jobs:
           mkdir -p "$RUNNER_TEMP/yoohwsm-dist"
           unzip -q "$RUNNER_TEMP/yoohwsm-review.zip" -d "$RUNNER_TEMP/yoohwsm-dist"
           wp plugin install plugin-check --version=2.2.0 --activate --path="${{ runner.temp }}/wordpress"
-          wp plugin check "$RUNNER_TEMP/yoohwsm-dist/yoohw-stock-manager" --path="${{ runner.temp }}/wordpress" --format=json > "$RUNNER_TEMP/plugin-check.txt"
+          wp plugin check "$RUNNER_TEMP/yoohwsm-dist/yoohw-stock-desk" --path="${{ runner.temp }}/wordpress" --format=json > "$RUNNER_TEMP/plugin-check.txt"
           python3 bin/check-plugin-check.py "$RUNNER_TEMP/plugin-check.txt"
 
   ci-gate:

@@ -1,5 +1,5 @@
 <?php
-/** Observe standard Woo stock hooks without handling stock a second time. @package YoOhwStockManager */
+/** Observe standard Woo stock hooks without handling stock a second time. @package YoOhwStockDesk */
 defined( 'ABSPATH' ) || exit;
 
 class YOOHWSM_Tracker {
