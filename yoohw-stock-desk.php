@@ -9,7 +9,6 @@
  * WC requires at least: 8.0
  * WC tested up to: 10.9
  * Author: Yo Ohw Studio
- * Author URI: https://yoohw.com
  * Text Domain: yoohw-stock-desk
  * Domain Path: /languages
  * License: GPL-2.0-or-later
