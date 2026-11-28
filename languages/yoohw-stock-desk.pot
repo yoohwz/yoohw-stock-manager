@@ -2,7 +2,7 @@
 # This file is distributed under the GPL-2.0-or-later.
 msgid ""
 msgstr ""
-"Project-Id-Version: YoOhw Stock Desk for WooCommerce 0.1.2\n"
+"Project-Id-Version: YoOhw Stock Desk for WooCommerce 0.1.3\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/yoohw-stock-desk\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -24,10 +24,6 @@ msgstr ""
 
 #. Author of the plugin
 msgid "Yo Ohw Studio"
-msgstr ""
-
-#. Author URI of the plugin
-msgid "https://yoohw.com"
 msgstr ""
 
 #: inc/class-yoohwsm-admin.php:18

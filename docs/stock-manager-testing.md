@@ -23,6 +23,8 @@ screens to Premium; source comparison alone is not browser evidence.
 The inherited matrix spans PHP 7.4–8.4, WP 6.3.5–7.0.2 and WC 8.0.3–10.9.4,
 legacy and HPOS. CI verifies effective order storage. MySQL 8 CI does not prove 5.7.
 Run Plugin Check separately and record the exact candidate and limitations.
+CI installs WordPress with WP_DEBUG and WP_DEBUG_LOG enabled and debug output hidden
+from HTTP responses.
 
 ## Implemented commands and boundary coverage
 
@@ -46,6 +48,8 @@ HTTP coverage includes mixed bulk success/failure, replay skipped counts, the
 WP_List_Table nonce collision regression, absent nonce, subscriber-denied mutation,
 history/export permissions, filtered export and CSV formula neutralization.
 Stock tests inject history, lookup and status SQL failures and reject nested transactions.
+They also cancel the savepoint probe with stale diagnostics, inject rollback-probe
+and diagnostic-query errors, and verify caller savepoints and stock remain intact.
 
 Plugin Check must report zero errors and zero warnings for the review ZIP. The CI
 parser rejects either finding type and unrecognized/truncated report formats.

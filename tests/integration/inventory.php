@@ -92,8 +92,34 @@ try {
 	yoohwsm_assert( 0.0 === (float) wc_get_product( $id )->get_stock_quantity(), 'Status failure stock not rolled back' );
 	// Existing caller transactions must survive refused adjustments.
 	$wpdb->query( 'START TRANSACTION' );
+	$wpdb->query( 'SAVEPOINT yoohwsm_test_caller' );
 	yoohwsm_assert( is_wp_error( $adjust( 'increase', '4' ) ), 'Nested transaction accepted' );
+	$quiet = $wpdb->suppress_errors( true );
+	$wpdb->query( 'ROLLBACK TO SAVEPOINT yoohwsm_test_absent' );
+	$wpdb->suppress_errors( $quiet );
+	$cancel_probe = static function ( $sql ) {
+		return 0 === strpos( $sql, 'ROLLBACK TO SAVEPOINT `yoohwsm_probe_' ) ? '' : $sql;
+	};
+	add_filter( 'query', $cancel_probe );
+	try {
+		yoohwsm_assert( is_wp_error( $adjust( 'increase', '4' ) ), 'Cancelled probe accepted stale error' );
+	} finally {
+		remove_filter( 'query', $cancel_probe );
+	}
+	yoohwsm_assert( false !== $wpdb->query( 'ROLLBACK TO SAVEPOINT yoohwsm_test_caller' ), 'Caller transaction was committed' );
 	$wpdb->query( 'ROLLBACK' );
+	foreach ( [ 'ROLLBACK TO SAVEPOINT `yoohwsm_probe_', 'SHOW ERRORS LIMIT 2' ] as $prefix ) {
+		$fail_probe = static function ( $sql ) use ( $prefix ) {
+			return 0 === strpos( $sql, $prefix ) ? 'INVALID YOOHWSM PROBE SQL' : $sql;
+		};
+		add_filter( 'query', $fail_probe );
+		try {
+			yoohwsm_assert( is_wp_error( $adjust( 'increase', '4' ) ), 'Unexpected probe or diagnostic failure accepted' );
+		} finally {
+			remove_filter( 'query', $fail_probe );
+		}
+	}
+	yoohwsm_assert( 0.0 === (float) wc_get_product( $id )->get_stock_quantity(), 'Failed transaction probe changed stock' );
 	// A standard product save is observed once.
 	$p = wc_get_product( $id );
 	$p->set_stock_quantity( 20 );
