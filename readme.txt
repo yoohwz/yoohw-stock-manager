@@ -5,7 +5,7 @@ Requires at least: 6.3
 Tested up to: 7.1
 Requires PHP: 7.4
 Requires Plugins: woocommerce
-Stable tag: 0.1.2
+Stable tag: 0.1.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -64,6 +64,9 @@ Yes. The 0.1.1 update preserves existing history and adjustment receipts in plac
 Use WooCommerce's product importer. This plugin only provides basic exports.
 
 == Changelog ==
+
+= 0.1.3 =
+* Remove the optional author URL and read savepoint diagnostics through the WordPress database API.
 
 = 0.1.2 =
 * Rename the plugin to YoOhw Stock Desk for WooCommerce and update its directory slug and text domain.

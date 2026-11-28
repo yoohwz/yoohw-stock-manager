@@ -49,7 +49,8 @@ class YOOHWSM_Store {
 		$note = sanitize_textarea_field( $note );
 		$hash = hash( 'sha256', wp_json_encode( [ get_current_user_id(), $operation, $quantity, $reason, $note ] ) );
 		// Reject nested transactions; do not commit a caller's pending work.
-		if ( ! $wpdb->dbh instanceof mysqli ) {
+		$connection = $wpdb->dbh;
+		if ( ! $connection instanceof mysqli ) {
 			return new WP_Error( 'yoohwsm_transaction', __( 'Stock adjustment requires a supported database connection.', 'yoohw-stock-desk' ) );
 		}
 		// SAVEPOINT is a no-op outside a transaction; only an existing transaction
@@ -57,14 +58,26 @@ class YOOHWSM_Store {
 		// caller work or relying on MariaDB-only @@in_transaction.
 		$quiet = $wpdb->suppress_errors( true );
 		$probe = 'yoohwsm_probe_' . substr( str_replace( '-', '', wp_generate_uuid4() ), 0, 16 );
-		$savepoint = $wpdb->query( "SAVEPOINT $probe" ); // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Transaction probe must execute against the live connection; generated hex-only identifier.
-		$active = $wpdb->query( "ROLLBACK TO SAVEPOINT $probe" ); // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Transaction probe must execute against the live connection; generated hex-only identifier.
-		$missing = 1305 === mysqli_errno( $wpdb->dbh ); // phpcs:ignore WordPress.DB.RestrictedFunctions -- wpdb exposes no error-number API; distinguish missing savepoint from connection failure.
-		if ( false !== $active ) {
-			$wpdb->query( "RELEASE SAVEPOINT $probe" ); // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Release the live transaction probe; generated hex-only identifier.
+		$savepoint_sql = $wpdb->prepare( 'SAVEPOINT %i', $probe );
+		$rollback_sql = $wpdb->prepare( 'ROLLBACK TO SAVEPOINT %i', $probe );
+		$savepoint = $wpdb->query( $savepoint_sql ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared -- Live savepoint command with a prepared identifier. SQL is prepared immediately above.
+		$missing = false;
+		if ( false !== $savepoint && $wpdb->last_query === $savepoint_sql && $connection === $wpdb->dbh ) {
+			$active = $wpdb->query( $rollback_sql ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared -- Live savepoint check with a prepared identifier. SQL is prepared immediately above.
+			if ( false !== $active ) {
+				$wpdb->query( $wpdb->prepare( 'RELEASE SAVEPOINT %i', $probe ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Release the live probe savepoint.
+			} elseif ( $wpdb->last_query === $rollback_sql && $connection === $wpdb->dbh ) {
+				// MySQL/MariaDB report 1305 for a missing savepoint. Match this probe's
+				// unique identifier to reject unrelated diagnostics without parsing localized prose.
+				$rows = $wpdb->query( 'SHOW ERRORS LIMIT 2' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Read the immediately preceding statement's live session diagnostics.
+				if ( 1 === $rows && $connection === $wpdb->dbh && 'SHOW ERRORS LIMIT 2' === $wpdb->last_query ) {
+					$error = $wpdb->last_result[0] ?? null;
+					$missing = 1305 === (int) ( $error->Code ?? 0 ) && false !== strpos( $error->Message ?? '', $probe );
+				}
+			}
 		}
 		$wpdb->suppress_errors( $quiet );
-		if ( false === $savepoint || false !== $active || ! $missing ) {
+		if ( ! $missing ) {
 			return new WP_Error( 'yoohwsm_transaction', __( 'Stock adjustment requires an independent transaction.', 'yoohw-stock-desk' ) );
 		}
 		foreach ( [ $wpdb->posts, $wpdb->postmeta, $wpdb->prefix . 'wc_product_meta_lookup', self::table() ] as $table ) {
@@ -73,7 +86,7 @@ class YOOHWSM_Store {
 				return new WP_Error( 'yoohwsm_engine', __( 'Stock adjustment requires InnoDB storage.', 'yoohw-stock-desk' ) );
 			}
 		}
-		if ( false === $wpdb->query( 'START TRANSACTION' ) ) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Transaction command must execute directly and must never be cached.
+		if ( $connection !== $wpdb->dbh || false === $wpdb->query( 'START TRANSACTION' ) ) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Transaction command must execute directly and must never be cached.
 			return new WP_Error( 'yoohwsm_transaction', __( 'The stock transaction could not start.', 'yoohw-stock-desk' ) );
 		}
 		self::$adjusting = true;

@@ -2,7 +2,7 @@
 /**
  * Plugin Name: YoOhw Stock Desk for WooCommerce
  * Description: Manage WooCommerce stock, adjustments, movement history and basic CSV exports.
- * Version: 0.1.2
+ * Version: 0.1.3
  * Requires at least: 6.3
  * Requires PHP: 7.4
  * Requires Plugins: woocommerce
@@ -17,7 +17,7 @@
  * @package YoOhwStockDesk
  */
 defined( 'ABSPATH' ) || exit;
-define( 'YOOHWSM_VERSION', '0.1.2' );
+define( 'YOOHWSM_VERSION', '0.1.3' );
 define( 'YOOHWSM_FILE', __FILE__ );
 require_once __DIR__ . '/inc/functions.php';
 register_activation_hook( __FILE__, 'yoohwsm_install' );
